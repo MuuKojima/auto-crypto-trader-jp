@@ -1,0 +1,12 @@
+steps:
+- name: node:12
+  entrypoint: npm
+  args: ["run", "create-env"]
+  env:
+    - 'SERVICE_ENV=${_SERVICE_ENV}'
+    - 'API_KEY=${_API_KEY}'
+    - 'API_SECRET=${_API_SECRET}'
+    - 'SERVICE_ID=${_SERVICE_ID}'
+    - 'ALGORITHM_ID=${_ALGORITHM_ID}'
+- name: "gcr.io/cloud-builders/gcloud"
+  args: ["app", "deploy", "app.yaml"]
