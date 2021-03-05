@@ -27,7 +27,6 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * Ready for subscribing
    */
   ready(): void {
-    console.log('Takuya Alorithm');
     this.latestPrice = store.getters<number>('trade.latestPrice');
     this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
       'trade.isIncreasedLatestPriceComparedToPreviousOne'

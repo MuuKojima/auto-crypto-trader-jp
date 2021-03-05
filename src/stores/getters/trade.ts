@@ -90,9 +90,9 @@ export const trade = {
 
   /**
    * nth price
-   * e.g. nth = 3
+   * e.g. nth = 0
    * Input: [500, 400, 300, 200, 100]
-   * Output: 300
+   * Output: 500
    * @param context
    * @param payload
    */

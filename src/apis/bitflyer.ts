@@ -10,6 +10,15 @@ import {
 const END_POINT = 'https://api.bitflyer.com/v1';
 const MARKET_SYMBOL = 'FX_BTC_JPY';
 
+interface OrderRequestBody {
+  product_code: string;
+  child_order_type: string;
+  side: string;
+  size: number;
+  price?: number;
+  minute_to_expire: number | undefined;
+}
+
 /**
  * BitflyerApi
  * @see: https://lightning.bitflyer.com/docs?lang=ja
@@ -50,14 +59,18 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  async buy(btcSize: number, price: number): Promise<void> {
+  async buy(
+    btcSize: number,
+    price: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
     await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
       child_order_type: 'LIMIT',
       side: 'BUY',
       size: btcSize,
-      price: price,
-      minute_to_expire: 10,
+      price,
+      minute_to_expire,
     });
   }
 
@@ -66,14 +79,18 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  async sell(btcSize: number, price: number): Promise<void> {
+  async sell(
+    btcSize: number,
+    price: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
     await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
       child_order_type: 'LIMIT',
       side: 'SELL',
       size: btcSize,
-      price: price,
-      minute_to_expire: 10,
+      price,
+      minute_to_expire,
     });
   }
 
@@ -82,13 +99,16 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  async marketBuy(btcSize: number): Promise<void> {
+  async marketBuy(
+    btcSize: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
     await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
       child_order_type: 'MARKET',
       side: 'BUY',
       size: btcSize,
-      minute_to_expire: 10,
+      minute_to_expire,
     });
   }
 
@@ -97,13 +117,16 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  async marketSell(btcSize: number): Promise<void> {
+  async marketSell(
+    btcSize: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
     await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
       child_order_type: 'MARKET',
       side: 'SELL',
       size: btcSize,
-      minute_to_expire: 10,
+      minute_to_expire,
     });
   }
 
@@ -112,7 +135,10 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  private async sendChildOrder(btcSize: number, body: any): Promise<void> {
+  private async sendChildOrder(
+    btcSize: number,
+    body: OrderRequestBody
+  ): Promise<void> {
     const timestamp = Date.now().toString();
     const data = JSON.stringify(body);
     const text = `${timestamp}POST/v1/me/sendchildorder${data}`;
@@ -138,6 +164,5 @@ export class BitflyerApi implements TradeApi {
         }
         throw err;
       });
-    console.log('order', res);
   }
 }
