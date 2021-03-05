@@ -10,6 +10,15 @@ import {
 const END_POINT = 'https://api.bitflyer.com/v1';
 const MARKET_SYMBOL = 'FX_BTC_JPY';
 
+interface OrderRequestBody {
+  product_code: string;
+  child_order_type: string;
+  side: string;
+  size: number;
+  price?: number;
+  minute_to_expire: number | undefined;
+}
+
 /**
  * BitflyerApi
  * @see: https://lightning.bitflyer.com/docs?lang=ja
@@ -48,52 +57,91 @@ export class BitflyerApi implements TradeApi {
   /**
    * Buy
    * @param btcSize
+   * @param body
    */
-  async buy(btcSize: number): Promise<void> {
-    const timestamp = Date.now().toString();
-    const data = JSON.stringify({
+  async buy(
+    btcSize: number,
+    price: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
+    await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
+      child_order_type: 'LIMIT',
       side: 'BUY',
       size: btcSize,
+      price,
+      minute_to_expire,
     });
-    const text = `${timestamp}POST/v1/me/sendchildorder'${data}`;
-    const sign = crypto
-      .createHmac('sha256', this.apiSecret)
-      .update(text)
-      .digest('hex');
-    const url = `${END_POINT}/me/sendchildorder`;
-    const config = {
-      headers: {
-        'ACCESS-KEY': this.apiKey,
-        'ACCESS-TIMESTAMP': timestamp,
-        'ACCESS-SIGN': sign,
-        'Content-Type': 'application/json',
-      },
-    };
-    const res = await axios
-      .post<BitflyerBuyAndSellResponse>(url, data, config)
-      .catch((err: AxiosError<BitflyerErrorResponse>) => {
-        if (err.response !== undefined) {
-          const errorMessage = `${err.response.data.status} : ${err.response.data.error_message}`;
-          console.error('TradeError: ', errorMessage);
-        }
-        throw err;
-      });
-    console.log('BUY', res);
   }
 
   /**
    * Sell
    * @param btcSize
+   * @param body
    */
-  async sell(btcSize: number): Promise<void> {
-    const timestamp = Date.now().toString();
-    const data = JSON.stringify({
+  async sell(
+    btcSize: number,
+    price: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
+    await this.sendChildOrder(btcSize, {
       product_code: MARKET_SYMBOL,
+      child_order_type: 'LIMIT',
       side: 'SELL',
       size: btcSize,
+      price,
+      minute_to_expire,
     });
-    const text = `${timestamp}POST/v1/me/sendchildorder'${data}`;
+  }
+
+  /**
+   * Market Buy
+   * @param btcSize
+   * @param body
+   */
+  async marketBuy(
+    btcSize: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
+    await this.sendChildOrder(btcSize, {
+      product_code: MARKET_SYMBOL,
+      child_order_type: 'MARKET',
+      side: 'BUY',
+      size: btcSize,
+      minute_to_expire,
+    });
+  }
+
+  /**
+   * Market Sell
+   * @param btcSize
+   * @param body
+   */
+  async marketSell(
+    btcSize: number,
+    minute_to_expire: number | undefined = undefined
+  ): Promise<void> {
+    await this.sendChildOrder(btcSize, {
+      product_code: MARKET_SYMBOL,
+      child_order_type: 'MARKET',
+      side: 'SELL',
+      size: btcSize,
+      minute_to_expire,
+    });
+  }
+
+  /**
+   * Send Child Order
+   * @param btcSize
+   * @param body
+   */
+  private async sendChildOrder(
+    btcSize: number,
+    body: OrderRequestBody
+  ): Promise<void> {
+    const timestamp = Date.now().toString();
+    const data = JSON.stringify(body);
+    const text = `${timestamp}POST/v1/me/sendchildorder${data}`;
     const sign = crypto
       .createHmac('sha256', this.apiSecret)
       .update(text)
@@ -116,6 +164,5 @@ export class BitflyerApi implements TradeApi {
         }
         throw err;
       });
-    console.log('SELL', res);
   }
 }

@@ -38,14 +38,14 @@ export const trade = {
    * @param payload
    * @param size
    */
-  buy: async (
+  marketBuy: async (
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
     if (appContext.config.sandboxMode) {
       return Promise.resolve();
     }
-    await tradeApi.buy(payload.size);
+    await tradeApi.marketBuy(payload.size);
   },
 
   /**
@@ -53,13 +53,13 @@ export const trade = {
    * @param payload
    * @param size
    */
-  sell: async (
+  marketSell: async (
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
     if (appContext.config.sandboxMode) {
       return Promise.resolve();
     }
-    await tradeApi.sell(payload.size);
+    await tradeApi.marketSell(payload.size);
   },
 };

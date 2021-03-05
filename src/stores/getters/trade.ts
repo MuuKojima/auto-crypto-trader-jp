@@ -89,6 +89,27 @@ export const trade = {
   },
 
   /**
+   * nth price
+   * e.g. nth = 0
+   * Input: [500, 400, 300, 200, 100]
+   * Output: 500
+   * @param context
+   * @param payload
+   */
+  nthPrice: (
+    context: GetterContext<TradeContext>,
+    payload: { nth: number }
+  ): number => {
+    const priceRecords = context.states.trade.priceRecords;
+    if (priceRecords.length <= payload.nth) {
+      return priceRecords[priceRecords.length - 1];
+    }
+    const _priceRecords = priceRecords.slice(0, payload.nth);
+    const price = _priceRecords[_priceRecords.length - 1];
+    return price;
+  },
+
+  /**
    * Whether latest price risen compared to the previous one
    * e.g.
    * Input: [500, 400, 300, 200, 100]

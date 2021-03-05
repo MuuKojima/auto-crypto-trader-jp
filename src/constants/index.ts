@@ -1,5 +1,6 @@
 export const ALGORITHM_ID_MAP = {
   threeTimesUpAndDown: 'three-times-up-and-down',
+  takuya: 'takuya',
 } as const;
 
 export const SERVICE_ID_MAP = {
