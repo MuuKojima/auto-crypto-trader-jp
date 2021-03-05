@@ -115,7 +115,7 @@ export class BitflyerApi implements TradeApi {
   private async sendChildOrder(btcSize: number, body: any): Promise<void> {
     const timestamp = Date.now().toString();
     const data = JSON.stringify(body);
-    const text = `${timestamp}POST/v1/me/sendchildorder'${data}`;
+    const text = `${timestamp}POST/v1/me/sendchildorder${data}`;
     const sign = crypto
       .createHmac('sha256', this.apiSecret)
       .update(text)
