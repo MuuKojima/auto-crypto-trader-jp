@@ -138,7 +138,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    */
   private async createSellOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.sell', { size });
+    await store.dispatch('trade.marketSell', { size });
     // Order report
     const benefit = orderPrice - this.myPricePosition;
     this.totalBenefit += benefit;
@@ -162,7 +162,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    */
   private async createBuyOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.buy', { size });
+    await store.dispatch('trade.marketBuy', { size });
     this.myPricePosition = orderPrice;
     console.log(`[TRADING] 🛍 ${orderPrice} yen`);
     console.log(this.myPricePosition);

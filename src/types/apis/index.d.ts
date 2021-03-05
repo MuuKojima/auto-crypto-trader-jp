@@ -1,7 +1,9 @@
 export interface TradeApi {
   fetchPrices(): Promise<number | undefined>;
-  buy(btcSize: number): Promise<void>;
-  sell(btcSize: number): Promise<void>;
+  buy(btcSize: number, price: number): Promise<void>;
+  sell(btcSize: number, price: number): Promise<void>;
+  marketBuy(btcSize: number): Promise<void>;
+  marketSell(btcSize: number): Promise<void>;
 }
 
 export interface BitflyerFetchResponse {
