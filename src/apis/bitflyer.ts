@@ -135,9 +135,7 @@ export class BitflyerApi implements TradeApi {
    * @param btcSize
    * @param body
    */
-  private async sendChildOrder(
-    body: OrderRequestBody
-  ): Promise<void> {
+  private async sendChildOrder(body: OrderRequestBody): Promise<void> {
     const timestamp = Date.now().toString();
     const data = JSON.stringify(body);
     const text = `${timestamp}POST/v1/me/sendchildorder${data}`;

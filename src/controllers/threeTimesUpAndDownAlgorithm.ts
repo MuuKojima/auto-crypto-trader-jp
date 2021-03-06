@@ -17,7 +17,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    * Dressup lifecycle
    */
   async dressup(): Promise<void> {
-    super.dressup();
+    await super.dressup();
   }
 
   /**

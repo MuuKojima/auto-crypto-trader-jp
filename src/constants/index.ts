@@ -19,11 +19,11 @@ export const CONFIG_DEFAULT_SETTING = {
 export const COMPARED_PRICE_STATUS = {
   up: 'up',
   down: 'down',
-  same: 'same'
+  same: 'same',
 } as const;
 
 export const COMPARED_PRICE_STATUS_ICON = {
   up: '🔼',
   down: '🔻',
-  same: '--'
+  same: '--',
 } as const;
