@@ -1,6 +1,7 @@
 import TradeAPI from '../../apis';
-import { ActionContext } from 'stores/storeManager';
 import appContext from '../../context';
+import { ActionContext } from '../../stores/storeManager';
+import { COMPARED_PRICE_STATUS, COMPARED_PRICE_STATUS_ICON } from '../../constants';
 
 const MAX_RECORD_SIZE = 1000;
 
@@ -20,17 +21,32 @@ export const trade = {
     if (!price) {
       return;
     }
-    const _priceRcords = context.getters<number[]>('trade.priceRecords');
-    if (_priceRcords.length < MAX_RECORD_SIZE && price) {
-      const priceRecords = _priceRcords.concat();
+    const priceRecords = context.getters<number[]>('trade.priceRecords').concat();
+    // If the maximum value is exceeded, remove the tail after adding the head.
+    if (priceRecords.length > MAX_RECORD_SIZE) {
       priceRecords.unshift(price);
+      priceRecords.pop();
       context.commit('trade.priceRecords', { priceRecords });
       return;
     }
-    const priceRecords = _priceRcords.concat();
+    // Add to head
     priceRecords.unshift(price);
-    priceRecords.pop();
     context.commit('trade.priceRecords', { priceRecords });
+    // Logging
+    const latestPrice = context.getters<number>('trade.latestPrice');
+    const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
+    let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> = COMPARED_PRICE_STATUS_ICON.same;
+    switch(priceStatus) {
+      case COMPARED_PRICE_STATUS.up:
+        statusIcon = COMPARED_PRICE_STATUS_ICON.up;
+        break;
+      case COMPARED_PRICE_STATUS.down:
+        statusIcon = COMPARED_PRICE_STATUS_ICON.down;
+        break;
+      default:
+        break;
+    }
+    console.log(`[TRADING] ${statusIcon}  ${latestPrice} yen`);
   },
 
   /**
@@ -43,7 +59,7 @@ export const trade = {
     payload: { size: number }
   ): Promise<void> => {
     if (appContext.config.sandboxMode) {
-      return Promise.resolve();
+      return;
     }
     await tradeApi.marketBuy(payload.size);
   },
@@ -58,7 +74,7 @@ export const trade = {
     payload: { size: number }
   ): Promise<void> => {
     if (appContext.config.sandboxMode) {
-      return Promise.resolve();
+      return;
     }
     await tradeApi.marketSell(payload.size);
   },

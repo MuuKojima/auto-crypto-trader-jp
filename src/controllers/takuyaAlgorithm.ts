@@ -14,7 +14,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   private secondPrice = 0;
   private thirdPrice = 0;
 
-  private isIncreasedLatestPriceComparedToPreviousOne = false;
+  private isIncreasedLatestPriceComparedToPreviousPrice = false;
   private lastComparedTime = Date.now();
   private myPricePosition = 0;
   private totalBenefit = 0;
@@ -28,13 +28,13 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    */
   ready(): void {
     this.latestPrice = store.getters<number>('trade.latestPrice');
-    this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-      'trade.isIncreasedLatestPriceComparedToPreviousOne'
+    this.isIncreasedLatestPriceComparedToPreviousPrice = store.getters<boolean>(
+      'trade.isIncreasedLatestPriceComparedToPreviousPrice'
     );
     store.subscribe('trade', async () => {
       this.latestPrice = store.getters<number>('trade.latestPrice');
-      this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-        'trade.isIncreasedLatestPriceComparedToPreviousOne'
+      this.isIncreasedLatestPriceComparedToPreviousPrice = store.getters<boolean>(
+        'trade.isIncreasedLatestPriceComparedToPreviousPrice'
       );
       const watchLength = COMPARE_INTERVAL_SEC / this.intervalSec;
       this.secondPrice = store.getters<number, { nth: number }>(
@@ -55,7 +55,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   async think(): Promise<void> {
     console.log(
       `[THINK] ${this.latestPrice} yen ${
-        this.isIncreasedLatestPriceComparedToPreviousOne ? '↑' : '↓'
+        this.isIncreasedLatestPriceComparedToPreviousPrice ? '↑' : '↓'
       } (orderSize: ${this.orderSizeBTC * this.latestPrice} yen)`
     );
 

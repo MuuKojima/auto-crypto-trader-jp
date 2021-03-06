@@ -10,7 +10,6 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   private latestPrice = 0;
   private prevPrice = 0;
   private oldestPrice = 0;
-  private isIncreasedLatestPriceComparedToPreviousOne = false;
   private myPricePosition = 0;
   private totalBenefit = 0;
 
@@ -31,18 +30,12 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
       'trade.oldestPriceByMaxSize',
       { size: MAX_RECORDE_SIZE }
     );
-    this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-      'trade.isIncreasedLatestPriceComparedToPreviousOne'
-    );
     store.subscribe('trade', async () => {
       this.latestPrice = store.getters<number>('trade.latestPrice');
       this.prevPrice = store.getters<number>('trade.prevPrice');
       this.oldestPrice = store.getters<number, { size: number }>(
         'trade.oldestPriceByMaxSize',
         { size: MAX_RECORDE_SIZE }
-      );
-      this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-        'trade.isIncreasedLatestPriceComparedToPreviousOne'
       );
       await this.think();
     });
@@ -52,11 +45,6 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    * Think sell or buy
    */
   async think(): Promise<void> {
-    console.log(
-      `[TRADING] ${this.latestPrice} yen ${
-        this.isIncreasedLatestPriceComparedToPreviousOne ? '🔼' : '🔻'
-      } (orderSize: ${this.orderSizeBTC * this.latestPrice} yen)`
-    );
     if (this.myPricePosition) {
       this.isUpTrend() && (await this.createSellOrder(this.orderSizeBTC));
     } else {

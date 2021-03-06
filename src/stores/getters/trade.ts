@@ -1,3 +1,4 @@
+import { COMPARED_PRICE_STATUS } from '../../constants';
 import { GetterContext } from '../storeManager';
 import { TradeContext } from '../../types/stores';
 
@@ -5,7 +6,7 @@ export const trade = {
   /**
    * All price record
    * e.g.
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: [500, 400, 300, 200, 100]
    * @param context
    */
@@ -16,7 +17,7 @@ export const trade = {
   /**
    * Price records by max size
    * e.g. size = 3
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: [500, 400, 300]
    * @param context
    * @param payload
@@ -35,7 +36,7 @@ export const trade = {
   /**
    * Latest price
    * e.g.
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: 500
    * @param context
    */
@@ -46,7 +47,7 @@ export const trade = {
   /**
    * Prev price
    * e.g.
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: 400
    * @param context
    */
@@ -57,7 +58,7 @@ export const trade = {
   /**
    * Oldest price
    * e.g.
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: 100
    * @param context
    */
@@ -70,7 +71,7 @@ export const trade = {
   /**
    * Oldest price by max size
    * e.g. size = 3
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: 300
    * @param context
    * @param payload
@@ -91,7 +92,7 @@ export const trade = {
   /**
    * nth price
    * e.g. nth = 0
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: 500
    * @param context
    * @param payload
@@ -112,15 +113,37 @@ export const trade = {
   /**
    * Whether latest price risen compared to the previous one
    * e.g.
-   * Input: [500, 400, 300, 200, 100]
+   * Resorce: [500, 400, 300, 200, 100]
    * Output: true
    * @param context
    */
-  isIncreasedLatestPriceComparedToPreviousOne: (
+  isIncreasedLatestPriceComparedToPreviousPrice: (
     context: GetterContext<TradeContext>
   ): boolean => {
     const latestPrice = context.states.trade.priceRecords[0];
     const prevPrice = context.states.trade.priceRecords[1];
     return latestPrice > prevPrice;
+  },
+
+
+  /**
+   * Returns the status of the current price compared to the previous price.
+   * e.g.
+   * Resorce: [500, 400, 300, 200, 100]
+   * Output: UP | DOWN | SAME
+   * @param context
+   */
+  statusForLatestPriceComparedToPreviousPrice: (
+    context: GetterContext<TradeContext>
+  ): keyof typeof COMPARED_PRICE_STATUS => {
+    const latestPrice = context.states.trade.priceRecords[0];
+    const prevPrice = context.states.trade.priceRecords[1];
+    if (latestPrice > prevPrice) {
+      return COMPARED_PRICE_STATUS.up
+    } else if (latestPrice < prevPrice) {
+      return COMPARED_PRICE_STATUS.down
+    } else {
+      return COMPARED_PRICE_STATUS.same
+    };
   },
 };
