@@ -3,7 +3,8 @@ import { BaseTradeAlgorithm } from './baseAlgorithm';
 import { elapsedSecFromNow } from '../utils';
 
 const COMPARE_INTERVAL_SEC = 30;
-const LOSSCUT_DIFF_YEN = 50;
+const LOSS_CUT_DIFF_YEN = 50;
+const TAKE_GAIN_DIFF_YEN = 30;
 
 /**
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
@@ -21,6 +22,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
 
   private POSITION_STATUS = {
     tooLoss: 'toLoss',
+    enoughGain: 'enoughGain',
   } as const;
 
   /**
@@ -64,6 +66,11 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       const status = this.checkPositionStatus();
       switch (status) {
         case this.POSITION_STATUS.tooLoss:
+          // loss cut
+          await this.createSellOrder(this.orderSizeBTC);
+          break;
+        case this.POSITION_STATUS.enoughGain:
+          // take gain
           await this.createSellOrder(this.orderSizeBTC);
           break;
         default:
@@ -116,13 +123,18 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   }
 
   private checkPositionStatus(): string {
-    const currentProfit =
-      this.latestPrice * this.orderSizeBTC - this.myPricePosition;
-    console.log(`[CheckPositionStatus] currentProfit: ${currentProfit}`);
-    const loss = -currentProfit;
-    if (loss > LOSSCUT_DIFF_YEN) {
+    const gain = this.latestPrice * this.orderSizeBTC - this.myPricePosition;
+    const loss = -gain;
+
+    console.log(`[CheckPositionStatus] gain: ${gain}`);
+
+    if (loss > LOSS_CUT_DIFF_YEN) {
       console.log('🛡 toLoss!!');
       return this.POSITION_STATUS.tooLoss;
+    }
+    if (gain > TAKE_GAIN_DIFF_YEN) {
+      console.log('👌 enough gain!');
+      return this.POSITION_STATUS.enoughGain;
     }
     return '';
   }
