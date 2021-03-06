@@ -125,7 +125,6 @@ export const trade = {
     return latestPrice > prevPrice;
   },
 
-
   /**
    * Returns the status of the current price compared to the previous price.
    * e.g.
@@ -145,5 +144,32 @@ export const trade = {
     } else {
       return COMPARED_PRICE_STATUS.same
     };
+  },
+
+  /**
+   * Ready to trade
+   */
+  isReady: (context: GetterContext<TradeContext>): boolean => {
+    return context.states.trade.isReady;
+  },
+
+  /**
+   * My price position
+   * @param context
+   */
+  myPricePosition: (
+    context: GetterContext<TradeContext>
+  ): number => {
+    return context.states.trade.myPricePosition;
+  },
+
+  /**
+   * Total benefit
+   * @param context
+   */
+  totalBenefit: (
+    context: GetterContext<TradeContext>
+  ): number => {
+    return context.states.trade.totalBenefit;
   },
 };

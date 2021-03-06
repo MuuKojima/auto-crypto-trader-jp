@@ -13,6 +13,18 @@ const tradeApi = TradeAPI.init(
 
 export const trade = {
   /**
+   * Ready to trade
+   * @param context
+   * @param payload
+   */
+  isReady: async (context: ActionContext, payload: { isReady: boolean }): Promise<void> => {
+    const {
+      isReady
+    } = payload;
+    context.commit('trade.isReady', { isReady });
+  },
+
+  /**
    * Fetch current market information
    * @param context
    */
@@ -45,11 +57,21 @@ export const trade = {
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
+    const {
+      size
+    } = payload;
+    // Prevent double order
+    context.commit('trade.isReady', { isReady: false });
     if (!appContext.config.sandboxMode) {
-      await tradeApi.marketBuy(payload.size);
+      await tradeApi.marketBuy(size);
     }
+    const latestPrice = context.getters<number>('trade.latestPrice');
+    const myPricePosition = Math.floor(latestPrice * size);
+    context.commit('trade.myPricePosition', { myPricePosition });
+    // Ready to trade
+    context.commit('trade.isReady', { isReady: true });
     // Logging
-    logging.printOrderPrice(context, payload.size);
+    logging.printMyPricePosition(myPricePosition);
   },
 
    /**
@@ -61,9 +83,29 @@ export const trade = {
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
+    const {
+      size
+    } = payload;
+    // Prevent double order
+    context.commit('trade.isReady', { isReady: false });
     if (!appContext.config.sandboxMode) {
-      await tradeApi.marketSell(payload.size);
-      return;
+      await tradeApi.marketSell(size);
     }
+    const myPricePosition = context.getters<number>('trade.myPricePosition');
+    const latestPrice = context.getters<number>('trade.latestPrice');
+    const orderPrice = latestPrice * size;
+    const clearMyPricePosition = 0;
+    const benefit = orderPrice - myPricePosition;
+    const prevTotalBenefit = context.getters<number>('trade.totalBenefit');
+    const totalBenefit = prevTotalBenefit + benefit;
+    context.commit('trade.totalBenefit', { totalBenefit });
+    // Clear postion
+    context.commit('trade.myPricePosition', { clearMyPricePosition });
+    // Ready to trade
+    context.commit('trade.isReady', { isReady: true });
+    // Logging
+    logging.printSellPrice(orderPrice);
+    logging.printBenefit(benefit);
+    logging.printTotalBenefit(totalBenefit);
   },
 };

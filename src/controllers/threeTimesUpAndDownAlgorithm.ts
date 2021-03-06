@@ -7,11 +7,11 @@ const MAX_RECORDE_SIZE = 3;
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
  */
 export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
+  private isReady = false;
   private latestPrice = 0;
   private prevPrice = 0;
   private oldestPrice = 0;
   private myPricePosition = 0;
-  private totalBenefit = 0;
 
   /**
    * Dressup lifecycle
@@ -24,6 +24,8 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    * Ready for subscribing
    */
   ready(): void {
+    this.isReady = store.getters<boolean>('trade.isReady');
+    this.myPricePosition = store.getters<number>('trade.myPricePosition');
     this.latestPrice = store.getters<number>('trade.latestPrice');
     this.prevPrice = store.getters<number>('trade.prevPrice');
     this.oldestPrice = store.getters<number, { size: number }>(
@@ -31,13 +33,15 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
       { size: MAX_RECORDE_SIZE }
     );
     store.subscribe('trade', async () => {
+      this.isReady = store.getters<boolean>('trade.isReady');
+      this.myPricePosition = store.getters<number>('trade.myPricePosition');
       this.latestPrice = store.getters<number>('trade.latestPrice');
       this.prevPrice = store.getters<number>('trade.prevPrice');
       this.oldestPrice = store.getters<number, { size: number }>(
         'trade.oldestPriceByMaxSize',
         { size: MAX_RECORDE_SIZE }
       );
-      await this.think();
+      this.isReady && await this.think();
     });
   }
 
@@ -46,9 +50,9 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    */
   async think(): Promise<void> {
     if (this.myPricePosition) {
-      this.isUpTrend() && (await this.createSellOrder(this.orderSizeBTC));
+      this.isUpTrend() && (await store.dispatch('trade.marketSell', { size: this.orderSizeBTC }));
     } else {
-      this.isDownTrend() && (await this.createBuyOrder(this.orderSizeBTC));
+      this.isDownTrend() && (await store.dispatch('trade.marketBuy', { size: this.orderSizeBTC }));
     }
   }
 
@@ -68,44 +72,5 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
     return (
       this.latestPrice < this.prevPrice && this.prevPrice < this.oldestPrice
     );
-  }
-
-  /**
-   * Sell
-   * 1. Sell order
-   * 2. Update total benefit
-   * 3. Show console for repors
-   * 4. Clear my position
-   * @param size
-   */
-  private async createSellOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.marketSell', { size });
-    // Order report
-    const benefit = orderPrice - this.myPricePosition;
-    this.totalBenefit += benefit;
-    console.log(`[TRADING] 💰 ${orderPrice} yen`);
-    // Diff report
-    const upOrDown = benefit > 0 ? '😆' : '😰';
-    console.log(
-      `[TRADING] ---- ${upOrDown} diff: ${benefit} yen ${upOrDown} ----`
-    );
-    console.log(`[TRADING] ---- 📊 total: ${this.totalBenefit} yen 📊 ----`);
-    // Clear my position
-    this.myPricePosition = 0;
-  }
-
-  /**
-   * Buy
-   * 1. Buy order
-   * 2. Update my postion
-   * 3. Show console for order price
-   * @param size
-   */
-  private async createBuyOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.marketBuy', { size });
-    this.myPricePosition = orderPrice;
-    console.log(this.myPricePosition);
   }
 }

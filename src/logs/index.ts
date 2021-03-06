@@ -8,10 +8,19 @@ const COMPARED_PRICE_STATUS_ICON = {
   down: '🔻',
   same: '--',
 } as const;
-const BUY_ICON = '🛍';
+const TRADE_ICON = {
+  buy: '🛍',
+  sell: '💰'
+}
+const BENEFIT_ICON = {
+  smile: '😆',
+  sweat: '😰'
+} as const;
+const GRAPH_ICON = '📊';
+
 
 /**
- * Print the status of the current price compared to the previous price.
+ * Print the status of the current price compared to the previous price
  * @param context
  */
 const printMarketPriceStatus = (context: ActionContext): void => {
@@ -32,18 +41,44 @@ const printMarketPriceStatus = (context: ActionContext): void => {
 }
 
 /**
- * Print order price
- * @param context
- * @param size
+ * Print my price position
+ * @param orderPrice
  */
-const printOrderPrice = (context: ActionContext, size: number): void => {
-  const latestPrice = context.getters<number>('trade.latestPrice');
-  const orderPrice = latestPrice * size;
-  console.log(`${LOG_PREFIX} ${BUY_ICON}  ${orderPrice} ${PRICE_UNIT}`);
+const printMyPricePosition = (printMyPricePosition: number): void => {
+  console.log(`${LOG_PREFIX} ${TRADE_ICON.buy}   ${printMyPricePosition} ${PRICE_UNIT}`);
 }
 
+/**
+ * Print sell price
+ * @param context
+ */
+const printSellPrice = (orderPrice: number): void => {
+  console.log(`${LOG_PREFIX} ${TRADE_ICON.sell} ${orderPrice} ${PRICE_UNIT}`);
+}
+
+/**
+ * Print benefit
+ * @param context
+ */
+const printBenefit = (benefit: number): void => {
+  const icon = benefit > 0 ? BENEFIT_ICON.smile : BENEFIT_ICON.sweat;
+  console.log(
+    `${LOG_PREFIX} ---- ${icon} diff: ${benefit} ${PRICE_UNIT} ${icon} ----`
+  );
+}
+
+/**
+ * Print total benefit
+ * @param context
+ */
+const printTotalBenefit = (totalBenefit: number): void => {
+  console.log(`${LOG_PREFIX} ---- ${GRAPH_ICON} total: ${totalBenefit} ${PRICE_UNIT} ${GRAPH_ICON} ----`);
+}
 
 export const logging = {
   printMarketPriceStatus,
-  printOrderPrice
+  printMyPricePosition,
+  printSellPrice,
+  printBenefit,
+  printTotalBenefit
 };
