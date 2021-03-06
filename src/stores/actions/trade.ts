@@ -1,7 +1,7 @@
 import TradeAPI from '../../apis';
 import appContext from '../../context';
 import { ActionContext } from '../../stores/storeManager';
-import { COMPARED_PRICE_STATUS, COMPARED_PRICE_STATUS_ICON } from '../../constants';
+import { logging } from 'logs';
 
 const MAX_RECORD_SIZE = 1000;
 
@@ -33,20 +33,7 @@ export const trade = {
     priceRecords.unshift(price);
     context.commit('trade.priceRecords', { priceRecords });
     // Logging
-    const latestPrice = context.getters<number>('trade.latestPrice');
-    const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
-    let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> = COMPARED_PRICE_STATUS_ICON.same;
-    switch(priceStatus) {
-      case COMPARED_PRICE_STATUS.up:
-        statusIcon = COMPARED_PRICE_STATUS_ICON.up;
-        break;
-      case COMPARED_PRICE_STATUS.down:
-        statusIcon = COMPARED_PRICE_STATUS_ICON.down;
-        break;
-      default:
-        break;
-    }
-    console.log(`[TRADING] ${statusIcon}  ${latestPrice} yen`);
+    logging.printMarketPriceStatus(context);
   },
 
   /**
