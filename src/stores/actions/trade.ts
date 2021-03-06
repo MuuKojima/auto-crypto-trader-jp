@@ -74,11 +74,11 @@ export const trade = {
     logging.printMyPricePosition(myPricePosition);
   },
 
-   /**
-    * Sell currency
-    * @param context
-    * @param payload
-    */
+  /**
+  * Sell currency
+  * @param context
+  * @param payload
+  */
   marketSell: async (
     context: ActionContext,
     payload: { size: number }
