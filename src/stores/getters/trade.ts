@@ -130,7 +130,7 @@ export const trade = {
    * Returns the status of the current price compared to the previous price.
    * e.g.
    * Resource: [500, 400, 300, 200, 100]
-   * Output: UP | DOWN | SAME
+   * Output: up | down | same
    * @param context
    */
   statusForLatestPriceComparedToPreviousPrice: (
