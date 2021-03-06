@@ -133,7 +133,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * 2. Update total benefit
    * 3. Show console for repors
    * 4. Clear my position
-   * @param size {number}
+   * @param size
    */
   private async createSellOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;
@@ -157,7 +157,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * 1. Buy order
    * 2. Update my postion
    * 3. Show console for order price
-   * @param size {number}
+   * @param size
    */
   private async createBuyOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;

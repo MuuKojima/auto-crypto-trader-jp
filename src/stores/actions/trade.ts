@@ -35,8 +35,8 @@ export const trade = {
 
   /**
    * Buy currency
+   * @param context
    * @param payload
-   * @param size
    */
   marketBuy: async (
     context: ActionContext,
@@ -48,11 +48,11 @@ export const trade = {
     await tradeApi.marketBuy(payload.size);
   },
 
-  /**
-   * Sell currency
-   * @param payload
-   * @param size
-   */
+   /**
+    * Sell currency
+    * @param context
+    * @param payload
+    */
   marketSell: async (
     context: ActionContext,
     payload: { size: number }

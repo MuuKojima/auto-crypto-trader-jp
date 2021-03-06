@@ -1,7 +1,7 @@
 import store from '../stores';
 import { BaseTradeAlgorithm } from './baseAlgorithm';
 
-const MAX_SIZE = 3;
+const MAX_RECORDE_SIZE = 3;
 
 /**
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
@@ -15,6 +15,13 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   private totalBenefit = 0;
 
   /**
+   * Dressup lifecycle
+   */
+  async dressup(): Promise<void> {
+    super.dressup();
+  }
+
+  /**
    * Ready for subscribing
    */
   ready(): void {
@@ -22,7 +29,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
     this.prevPrice = store.getters<number>('trade.prevPrice');
     this.oldestPrice = store.getters<number, { size: number }>(
       'trade.oldestPriceByMaxSize',
-      { size: MAX_SIZE }
+      { size: MAX_RECORDE_SIZE }
     );
     this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
       'trade.isIncreasedLatestPriceComparedToPreviousOne'
@@ -32,7 +39,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
       this.prevPrice = store.getters<number>('trade.prevPrice');
       this.oldestPrice = store.getters<number, { size: number }>(
         'trade.oldestPriceByMaxSize',
-        { size: MAX_SIZE }
+        { size: MAX_RECORDE_SIZE }
       );
       this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
         'trade.isIncreasedLatestPriceComparedToPreviousOne'
@@ -81,11 +88,11 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    * 2. Update total benefit
    * 3. Show console for repors
    * 4. Clear my position
-   * @param size {number}
+   * @param size
    */
   private async createSellOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.sell', { size });
+    await store.dispatch('trade.marketSell', { size });
     // Order report
     const benefit = orderPrice - this.myPricePosition;
     this.totalBenefit += benefit;
@@ -105,11 +112,11 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    * 1. Buy order
    * 2. Update my postion
    * 3. Show console for order price
-   * @param size {number}
+   * @param size
    */
   private async createBuyOrder(size: number): Promise<void> {
     const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.buy', { size });
+    await store.dispatch('trade.marketBuy', { size });
     this.myPricePosition = orderPrice;
     console.log(`[TRADING] 🛍 ${orderPrice} yen`);
     console.log(this.myPricePosition);
