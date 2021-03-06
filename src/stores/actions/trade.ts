@@ -1,7 +1,7 @@
 import TradeAPI from '../../apis';
 import appContext from '../../context';
 import { ActionContext } from '../../stores/storeManager';
-import { logging } from 'logs';
+import { logging } from '../../logs';
 
 const MAX_RECORD_SIZE = 1000;
 

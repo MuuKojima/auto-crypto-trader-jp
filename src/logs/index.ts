@@ -1,6 +1,9 @@
 import { COMPARED_PRICE_STATUS } from '../constants';
 import { ActionContext } from '../stores/storeManager';
 
+const LOG_PREFIX = '[TRADING]';
+const PRICE_UNIT = 'yen';
+
 const COMPARED_PRICE_STATUS_ICON = {
   up: '🔼',
   down: '🔻',
@@ -21,7 +24,7 @@ const printMarketPriceStatus = (context: ActionContext): void => {
     default:
       break;
   }
-  console.log(`[TRADING] ${statusIcon}  ${latestPrice} yen`);
+  console.log(`${LOG_PREFIX} ${statusIcon}  ${latestPrice} ${PRICE_UNIT}`);
 }
 
 export const logging = {
