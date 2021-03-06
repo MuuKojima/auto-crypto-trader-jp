@@ -21,9 +21,3 @@ export const COMPARED_PRICE_STATUS = {
   down: 'down',
   same: 'same',
 } as const;
-
-export const COMPARED_PRICE_STATUS_ICON = {
-  up: '🔼',
-  down: '🔻',
-  same: '--',
-} as const;

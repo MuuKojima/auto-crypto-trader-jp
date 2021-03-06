@@ -1,6 +1,11 @@
-import { COMPARED_PRICE_STATUS_ICON } from '../constants';
 import { COMPARED_PRICE_STATUS } from '../constants';
 import { ActionContext } from '../stores/storeManager';
+
+const COMPARED_PRICE_STATUS_ICON = {
+  up: '🔼',
+  down: '🔻',
+  same: '--',
+} as const;
 
 const printMarketPriceStatus = (context: ActionContext): void => {
   const latestPrice = context.getters<number>('trade.latestPrice');
