@@ -38,7 +38,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
         'trade.isIncreasedLatestPriceComparedToPreviousOne'
       );
-      const watchLength = COMPARE_INTERVAL_SEC / this.intervalSec;
+      const watchLength = Math.round(COMPARE_INTERVAL_SEC / this.intervalSec);
       this.secondPrice = store.getters<number, { nth: number }>(
         'trade.nthPrice',
         { nth: watchLength }
