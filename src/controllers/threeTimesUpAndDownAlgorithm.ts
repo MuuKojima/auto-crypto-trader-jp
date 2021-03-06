@@ -106,7 +106,6 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
     const orderPrice = this.latestPrice * size;
     await store.dispatch('trade.marketBuy', { size });
     this.myPricePosition = orderPrice;
-    console.log(`[TRADING] 🛍 ${orderPrice} yen`);
     console.log(this.myPricePosition);
   }
 }

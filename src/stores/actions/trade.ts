@@ -45,10 +45,11 @@ export const trade = {
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
-    if (appContext.config.sandboxMode) {
-      return;
+    if (!appContext.config.sandboxMode) {
+      await tradeApi.marketBuy(payload.size);
     }
-    await tradeApi.marketBuy(payload.size);
+    // Logging
+    logging.printOrderPrice(context, payload.size);
   },
 
    /**
@@ -60,9 +61,9 @@ export const trade = {
     context: ActionContext,
     payload: { size: number }
   ): Promise<void> => {
-    if (appContext.config.sandboxMode) {
+    if (!appContext.config.sandboxMode) {
+      await tradeApi.marketSell(payload.size);
       return;
     }
-    await tradeApi.marketSell(payload.size);
   },
 };
