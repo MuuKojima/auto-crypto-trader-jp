@@ -2,6 +2,7 @@ import TradeAPI from '../../apis';
 import appContext from '../../context';
 import { ActionContext } from '../../stores/storeManager';
 import { logging } from '../../logs';
+import { COMPARED_PRICE_STATUS } from '../../constants';
 
 const MAX_RECORD_SIZE = 1000;
 
@@ -45,7 +46,9 @@ export const trade = {
     priceRecords.unshift(price);
     context.commit('trade.priceRecords', { priceRecords });
     // Logging
-    logging.printMarketPriceStatus(context);
+    const latestPrice = context.getters<number>('trade.latestPrice');
+    const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
+    logging.printMarketPriceStatus(latestPrice, priceStatus);
   },
 
   /**

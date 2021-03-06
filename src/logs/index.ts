@@ -1,5 +1,4 @@
 import { COMPARED_PRICE_STATUS } from '../constants';
-import { ActionContext } from '../stores/storeManager';
 
 const LOG_PREFIX = '[TRADING]';
 const PRICE_UNIT = 'yen';
@@ -18,14 +17,11 @@ const BENEFIT_ICON = {
 } as const;
 const GRAPH_ICON = '📊';
 
-
 /**
  * Print the status of the current price compared to the previous price
  * @param context
  */
-const printMarketPriceStatus = (context: ActionContext): void => {
-  const latestPrice = context.getters<number>('trade.latestPrice');
-  const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
+const printMarketPriceStatus = (latestPrice: number, priceStatus: keyof typeof COMPARED_PRICE_STATUS): void => {
   let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> = COMPARED_PRICE_STATUS_ICON.same;
   switch(priceStatus) {
     case COMPARED_PRICE_STATUS.up:
@@ -33,8 +29,6 @@ const printMarketPriceStatus = (context: ActionContext): void => {
       break;
     case COMPARED_PRICE_STATUS.down:
       statusIcon = COMPARED_PRICE_STATUS_ICON.down;
-      break;
-    default:
       break;
   }
   console.log(`${LOG_PREFIX} ${statusIcon}  ${latestPrice} ${PRICE_UNIT}`);
