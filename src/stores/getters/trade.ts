@@ -6,7 +6,7 @@ export const trade = {
   /**
    * All price record
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: [500, 400, 300, 200, 100]
    * @param context
    */
@@ -17,7 +17,7 @@ export const trade = {
   /**
    * Price records by max size
    * e.g. size = 3
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: [500, 400, 300]
    * @param context
    * @param payload
@@ -36,7 +36,7 @@ export const trade = {
   /**
    * Latest price
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: 500
    * @param context
    */
@@ -47,7 +47,7 @@ export const trade = {
   /**
    * Prev price
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: 400
    * @param context
    */
@@ -58,7 +58,7 @@ export const trade = {
   /**
    * Oldest price
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: 100
    * @param context
    */
@@ -71,7 +71,7 @@ export const trade = {
   /**
    * Oldest price by max size
    * e.g. size = 3
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: 300
    * @param context
    * @param payload
@@ -92,7 +92,7 @@ export const trade = {
   /**
    * nth price
    * e.g. nth = 0
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: 500
    * @param context
    * @param payload
@@ -113,7 +113,7 @@ export const trade = {
   /**
    * Whether latest price risen compared to the previous one
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: true
    * @param context
    */
@@ -129,7 +129,7 @@ export const trade = {
   /**
    * Returns the status of the current price compared to the previous price.
    * e.g.
-   * Resorce: [500, 400, 300, 200, 100]
+   * Resource: [500, 400, 300, 200, 100]
    * Output: UP | DOWN | SAME
    * @param context
    */
