@@ -39,7 +39,7 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Fetch
+   * Fetch prices
    */
   async fetchPrices(): Promise<number | undefined> {
     const url = `${END_POINT}/ticker`;
@@ -56,9 +56,10 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Buy
+   * Buy at limit price
    * @param btcSize
-   * @param body
+   * @param price
+   * @param minute_to_expire
    */
   async buy(
     btcSize: number,
@@ -76,9 +77,10 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Sell
+   * Sell at limit price
    * @param btcSize
-   * @param body
+   * @param price
+   * @param minute_to_expire
    */
   async sell(
     btcSize: number,
@@ -96,7 +98,7 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Market Buy
+   * Market buy
    * @param btcSize
    * @param body
    */
@@ -114,7 +116,7 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Market Sell
+   * Market sell
    * @param btcSize
    * @param body
    */
@@ -132,8 +134,7 @@ export class BitflyerApi implements TradeApi {
   }
 
   /**
-   * Send Child Order
-   * @param btcSize
+   * Send child order
    * @param body
    */
   private async sendChildOrder(body: OrderRequestBody): Promise<void> {
@@ -162,6 +163,7 @@ export class BitflyerApi implements TradeApi {
         }
         throw err;
       });
+    // Logging
     logging.printOrderSuccess(String(res));
   }
 }
