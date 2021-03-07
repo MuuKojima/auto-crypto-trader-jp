@@ -81,10 +81,10 @@ export const trade = {
   },
 
   /**
-  * Sell currency
-  * @param context
-  * @param payload
-  */
+   * Sell currency
+   * @param context
+   * @param payload
+   */
   marketSell: async (
     context: ActionContext,
     payload: { size: number } = { size: defaultOrderSizeBTC }

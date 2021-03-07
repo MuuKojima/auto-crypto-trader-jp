@@ -51,11 +51,9 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    */
   async think(): Promise<void> {
     if (this.myPricePosition) {
-      this.isUpTrend() &&
-        (await store.dispatch('trade.marketSell'));
+      this.isUpTrend() && (await store.dispatch('trade.marketSell'));
     } else {
-      this.isDownTrend() &&
-        (await store.dispatch('trade.marketBuy'));
+      this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
     }
   }
 
