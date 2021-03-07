@@ -50,7 +50,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   }
 
   /**
-   * Think sell or buy
+   * Think sell or buy or standby
    */
   async think(): Promise<void> {
     console.log(

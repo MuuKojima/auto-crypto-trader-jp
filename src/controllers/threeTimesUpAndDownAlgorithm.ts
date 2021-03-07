@@ -46,7 +46,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   }
 
   /**
-   * Think sell or buy
+   * Think sell or buy or standby or standby
    */
   async think(): Promise<void> {
     if (this.myPricePosition) {
@@ -58,6 +58,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Whether the value has risen three times in a row
+   * e.g. [500, 400, 300]
    */
   private isUpTrend() {
     return (
@@ -67,6 +68,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Whether the value has dropped three times in a row
+   * e.g. [300, 400, 500]
    */
   private isDownTrend() {
     return (

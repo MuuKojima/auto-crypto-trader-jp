@@ -27,7 +27,7 @@ export class BaseTradeAlgorithm {
   }
 
   /**
-   * Think sell or buy
+   * Think sell or buy or standby
    */
   protected async think(): Promise<void> {
     // Override here

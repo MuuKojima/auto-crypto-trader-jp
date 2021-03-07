@@ -30,8 +30,6 @@ export const trade = {
    * @param context
    */
   fetch: async (context: ActionContext): Promise<void> => {
-    // Prevent double order
-    context.commit('trade.isReady', { isReady: false });
     const latestPrice = await tradeApi.fetchPrices();
     if (!latestPrice) {
       return;
@@ -47,8 +45,6 @@ export const trade = {
     // Add to head
     priceRecords.unshift(latestPrice);
     context.commit('trade.priceRecords', { priceRecords });
-    // Ready to trade
-    context.commit('trade.isReady', { isReady: true });
     // Logging
     const _latestPrice = context.getters<number>('trade.latestPrice');
     const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');

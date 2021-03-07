@@ -1,5 +1,5 @@
 export const trade = {
-  isReady: false,
+  isReady: true,
   // [Latest ... Oldest]
   priceRecords: [],
   myPricePosition: 0,
