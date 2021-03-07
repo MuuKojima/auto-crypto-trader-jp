@@ -30,25 +30,29 @@ export const trade = {
    * @param context
    */
   fetch: async (context: ActionContext): Promise<void> => {
-    const price = await tradeApi.fetchPrices();
-    if (!price) {
+    // Prevent double order
+    context.commit('trade.isReady', { isReady: false });
+    const latestPrice = await tradeApi.fetchPrices();
+    if (!latestPrice) {
       return;
     }
     const priceRecords = context.getters<number[]>('trade.priceRecords').concat();
     // If the maximum value is exceeded, remove the tail after adding the head.
     if (priceRecords.length > MAX_RECORD_SIZE) {
-      priceRecords.unshift(price);
+      priceRecords.unshift(latestPrice);
       priceRecords.pop();
       context.commit('trade.priceRecords', { priceRecords });
       return;
     }
     // Add to head
-    priceRecords.unshift(price);
+    priceRecords.unshift(latestPrice);
     context.commit('trade.priceRecords', { priceRecords });
+    // Ready to trade
+    context.commit('trade.isReady', { isReady: true });
     // Logging
-    const latestPrice = context.getters<number>('trade.latestPrice');
+    const _latestPrice = context.getters<number>('trade.latestPrice');
     const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
-    logging.printMarketPriceStatus(latestPrice, priceStatus);
+    logging.printMarketPriceStatus(_latestPrice, priceStatus);
   },
 
   /**
