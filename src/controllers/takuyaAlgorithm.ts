@@ -1,5 +1,6 @@
 import store from '../stores';
 import { BaseTradeAlgorithm } from './baseAlgorithm';
+import { elapsedSecFromNow } from '../utils';
 
 const COMPARE_INTERVAL_SEC = 30;
 const LOSS_CUT_DIFF_YEN = 50;
@@ -21,6 +22,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   private latestPrice = 0;
   private secondPrice = 0;
   private thirdPrice = 0;
+  private lastComparedTime = Date.now();
 
   /**
    * Dressup each lifecycle
@@ -82,6 +84,18 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
     } else {
       this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
     }
+
+    // compare
+    const isTimeToCompare =
+      elapsedSecFromNow(this.lastComparedTime) > COMPARE_INTERVAL_SEC;
+    if (isTimeToCompare) {
+      this.lastComparedTime = Date.now();
+      if (this.myPricePosition) {
+        this.isUpTrend() && (await store.dispatch('trade.marketSell'));
+      } else {
+        this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
+      }
+    }
   }
 
   /**
@@ -116,6 +130,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Check postion status
+   * Output
    */
   private checkPositionStatus(): string {
     const gain = this.benefit;
