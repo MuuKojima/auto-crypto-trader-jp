@@ -1,5 +1,3 @@
-import { COMPARED_PRICE_STATUS } from '../constants';
-
 const LOG_PREFIX = '[TRADING]';
 const PRICE_UNIT = 'yen';
 const COMPARED_PRICE_STATUS_ICON = {
@@ -7,13 +5,13 @@ const COMPARED_PRICE_STATUS_ICON = {
   down: '🔻',
   same: '--',
 } as const;
-const TRADE_ICON = {
+const MARKET_ICON = {
   buy: '🛍',
-  sell: '💰'
-}
+  sell: '💰',
+};
 const BENEFIT_ICON = {
   smile: '😆',
-  sweat: '😰'
+  sweat: '😰',
 } as const;
 const GRAPH_ICON = '📊';
 
@@ -21,32 +19,38 @@ const GRAPH_ICON = '📊';
  * Print the status of the current price compared to the previous price
  * @param context
  */
-const printMarketPriceStatus = (latestPrice: number, prevPrice: number): void => {
-  let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> = COMPARED_PRICE_STATUS_ICON.same;
+const printMarketPriceStatus = (
+  latestPrice: number,
+  prevPrice: number
+): void => {
+  let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> =
+    COMPARED_PRICE_STATUS_ICON.same;
   if (latestPrice > prevPrice) {
-    statusIcon = COMPARED_PRICE_STATUS_ICON.up
+    statusIcon = COMPARED_PRICE_STATUS_ICON.up;
   }
   if (latestPrice < prevPrice) {
-    statusIcon = COMPARED_PRICE_STATUS_ICON.down
-  };
+    statusIcon = COMPARED_PRICE_STATUS_ICON.down;
+  }
   console.log(`${LOG_PREFIX} ${statusIcon}  ${latestPrice} ${PRICE_UNIT}`);
-}
+};
 
 /**
  * Print my price position
  * @param orderPrice
  */
 const printMyPricePosition = (printMyPricePosition: number): void => {
-  console.log(`${LOG_PREFIX} ${TRADE_ICON.buy}   ${printMyPricePosition} ${PRICE_UNIT}`);
-}
+  console.log(
+    `${LOG_PREFIX} ${MARKET_ICON.buy}   ${printMyPricePosition} ${PRICE_UNIT}`
+  );
+};
 
 /**
  * Print sell price
  * @param context
  */
 const printSellPrice = (orderPrice: number): void => {
-  console.log(`${LOG_PREFIX} ${TRADE_ICON.sell} ${orderPrice} ${PRICE_UNIT}`);
-}
+  console.log(`${LOG_PREFIX} ${MARKET_ICON.sell} ${orderPrice} ${PRICE_UNIT}`);
+};
 
 /**
  * Print benefit
@@ -57,20 +61,22 @@ const printBenefit = (benefit: number): void => {
   console.log(
     `${LOG_PREFIX} ---- ${icon} diff: ${benefit} ${PRICE_UNIT} ${icon} ----`
   );
-}
+};
 
 /**
  * Print total benefit
  * @param context
  */
 const printTotalBenefit = (totalBenefit: number): void => {
-  console.log(`${LOG_PREFIX} ---- ${GRAPH_ICON} total: ${totalBenefit} ${PRICE_UNIT} ${GRAPH_ICON} ----`);
-}
+  console.log(
+    `${LOG_PREFIX} ---- ${GRAPH_ICON} total: ${totalBenefit} ${PRICE_UNIT} ${GRAPH_ICON} ----`
+  );
+};
 
 export const logging = {
   printMarketPriceStatus,
   printMyPricePosition,
   printSellPrice,
   printBenefit,
-  printTotalBenefit
+  printTotalBenefit,
 };

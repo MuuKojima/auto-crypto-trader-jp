@@ -2,10 +2,12 @@ import TradeAPI from '../../apis';
 import appContext from '../../context';
 import { ActionContext } from '../../stores/storeManager';
 import { logging } from '../../logs';
-import { COMPARED_PRICE_STATUS } from '../../constants';
 
 const MAX_RECORD_SIZE = 1000;
 
+// Initialize tarde api
+// e.g. SERVICE_ID = 'bitflyer'
+// Output: new BitflyerApi(...)
 const tradeApi = TradeAPI.init(
   process.env.SERVICE_ID,
   process.env.API_KEY || '',

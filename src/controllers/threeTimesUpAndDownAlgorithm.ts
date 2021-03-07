@@ -41,7 +41,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
         'trade.oldestPriceByMaxSize',
         { size: MAX_RECORDE_SIZE }
       );
-      this.isReady && await this.think();
+      this.isReady && (await this.think());
     });
   }
 
@@ -50,9 +50,11 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
    */
   async think(): Promise<void> {
     if (this.myPricePosition) {
-      this.isUpTrend() && (await store.dispatch('trade.marketSell', { size: this.orderSizeBTC }));
+      this.isUpTrend() &&
+        (await store.dispatch('trade.marketSell', { size: this.orderSizeBTC }));
     } else {
-      this.isDownTrend() && (await store.dispatch('trade.marketBuy', { size: this.orderSizeBTC }));
+      this.isDownTrend() &&
+        (await store.dispatch('trade.marketBuy', { size: this.orderSizeBTC }));
     }
   }
 
