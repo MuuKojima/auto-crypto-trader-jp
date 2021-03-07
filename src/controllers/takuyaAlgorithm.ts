@@ -11,33 +11,37 @@ const TAKE_GAIN_DIFF_YEN = 30;
  * + Loss-cut function
  */
 export class TakuyaAlgorithm extends BaseTradeAlgorithm {
-  private latestPrice = 0;
-  private secondPrice = 0;
-  private thirdPrice = 0;
-
-  private isIncreasedLatestPriceComparedToPreviousPrice = false;
-  private lastComparedTime = Date.now();
-  private myPricePosition = 0;
-  private totalBenefit = 0;
-
   private POSITION_STATUS = {
     tooLoss: 'toLoss',
     enoughGain: 'enoughGain',
   } as const;
 
+  private isReady = false;
+  private myPricePosition = 0;
+  private latestPrice = 0;
+  private secondPrice = 0;
+  private thirdPrice = 0;
+  private lastComparedTime = Date.now();
+
+  /**
+   * Dressup each lifecycle
+   * ready(), think(), dance()
+   */
+  async dressup(): Promise<void> {
+    await super.dressup();
+  }
+
   /**
    * Ready for subscribing
    */
   ready(): void {
+    this.isReady = store.getters<boolean>('trade.isReady');
+    this.myPricePosition = store.getters<number>('trade.myPricePosition');
     this.latestPrice = store.getters<number>('trade.latestPrice');
-    this.isIncreasedLatestPriceComparedToPreviousPrice = store.getters<boolean>(
-      'trade.isIncreasedLatestPriceComparedToPreviousPrice'
-    );
     store.subscribe('trade', async () => {
+      this.isReady = store.getters<boolean>('trade.isReady');
+      this.myPricePosition = store.getters<number>('trade.myPricePosition');
       this.latestPrice = store.getters<number>('trade.latestPrice');
-      this.isIncreasedLatestPriceComparedToPreviousPrice = store.getters<boolean>(
-        'trade.isIncreasedLatestPriceComparedToPreviousPrice'
-      );
       const watchLength = Math.round(COMPARE_INTERVAL_SEC / this.intervalSec);
       this.secondPrice = store.getters<number, { nth: number }>(
         'trade.nthPrice',
@@ -47,7 +51,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
         'trade.nthPrice',
         { nth: watchLength * 2 }
       );
-      await this.think();
+      this.isReady && (await this.think());
     });
   }
 
@@ -55,23 +59,17 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * Think sell or buy or standby
    */
   async think(): Promise<void> {
-    console.log(
-      `[THINK] ${this.latestPrice} yen ${
-        this.isIncreasedLatestPriceComparedToPreviousPrice ? '↑' : '↓'
-      } (orderSize: ${this.orderSizeBTC * this.latestPrice} yen)`
-    );
-
     // check
     if (this.myPricePosition) {
       const status = this.checkPositionStatus();
       switch (status) {
         case this.POSITION_STATUS.tooLoss:
           // loss cut
-          await this.createSellOrder(this.orderSizeBTC);
+          await store.dispatch('trade.marketSell');
           break;
         case this.POSITION_STATUS.enoughGain:
           // take gain
-          await this.createSellOrder(this.orderSizeBTC);
+          await store.dispatch('trade.marketSell');
           break;
         default:
           break;
@@ -83,15 +81,10 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       elapsedSecFromNow(this.lastComparedTime) > COMPARE_INTERVAL_SEC;
     if (isTimeToCompare) {
       this.lastComparedTime = Date.now();
-      console.log(
-        `[COMPARE] ${this.latestPrice} yen ${
-          this.secondPrice > this.thirdPrice ? '🔼' : '🔻'
-        } (orderSize: ${this.orderSizeBTC * this.latestPrice} yen)`
-      );
       if (this.myPricePosition) {
-        this.isUpTrend() && (await this.createSellOrder(this.orderSizeBTC));
+        this.isUpTrend() && (await store.dispatch('trade.marketSell'));
       } else {
-        this.isDownTrend() && (await this.createBuyOrder(this.orderSizeBTC));
+        this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
       }
     }
   }
@@ -106,6 +99,8 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Whether the value has risen three times in a row
+   * e.g.
+   * True: 500 > 400 && 400 > 300
    */
   private isUpTrend() {
     return (
@@ -115,6 +110,8 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Whether the value has dropped three times in a row
+   * e.g.
+   * True: 300 > 400 && 400 > 500
    */
   private isDownTrend() {
     return (
@@ -137,45 +134,5 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       return this.POSITION_STATUS.enoughGain;
     }
     return '';
-  }
-
-  /**
-   * Sell
-   * 1. Sell order
-   * 2. Update total benefit
-   * 3. Show console for repors
-   * 4. Clear my position
-   * @param size
-   */
-  private async createSellOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.marketSell', { size });
-    // Order report
-    const benefit = orderPrice - this.myPricePosition;
-    this.totalBenefit += benefit;
-    console.log(`[TRADING] 💰 ${orderPrice} yen`);
-    // Diff report
-    const upOrDown = benefit > 0 ? '😆' : '😰';
-    console.log(
-      `[TRADING] ---- ${upOrDown} diff: ${benefit} yen ${upOrDown} ----`
-    );
-    console.log(`[TRADING] ---- 📊 total: ${this.totalBenefit} yen 📊 ----`);
-    // Clear my position
-    this.myPricePosition = 0;
-  }
-
-  /**
-   * Buy
-   * 1. Buy order
-   * 2. Update my postion
-   * 3. Show console for order price
-   * @param size
-   */
-  private async createBuyOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.marketBuy', { size });
-    this.myPricePosition = orderPrice;
-    console.log(`[TRADING] 🛍 ${orderPrice} yen`);
-    console.log(this.myPricePosition);
   }
 }

@@ -9,8 +9,8 @@ const MAX_RECORDE_SIZE = 3;
 export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   private isReady = false;
   private latestPrice = 0;
-  private prevPrice = 0;
-  private oldestPrice = 0;
+  private secondPrice = 0;
+  private thirdPrice = 0;
   private myPricePosition = 0;
 
   /**
@@ -28,8 +28,8 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
     this.isReady = store.getters<boolean>('trade.isReady');
     this.myPricePosition = store.getters<number>('trade.myPricePosition');
     this.latestPrice = store.getters<number>('trade.latestPrice');
-    this.prevPrice = store.getters<number>('trade.prevPrice');
-    this.oldestPrice = store.getters<number, { size: number }>(
+    this.secondPrice = store.getters<number>('trade.prevPrice');
+    this.thirdPrice = store.getters<number, { size: number }>(
       'trade.oldestPriceByMaxSize',
       { size: MAX_RECORDE_SIZE }
     );
@@ -37,8 +37,8 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
       this.isReady = store.getters<boolean>('trade.isReady');
       this.myPricePosition = store.getters<number>('trade.myPricePosition');
       this.latestPrice = store.getters<number>('trade.latestPrice');
-      this.prevPrice = store.getters<number>('trade.prevPrice');
-      this.oldestPrice = store.getters<number, { size: number }>(
+      this.secondPrice = store.getters<number>('trade.prevPrice');
+      this.thirdPrice = store.getters<number, { size: number }>(
         'trade.oldestPriceByMaxSize',
         { size: MAX_RECORDE_SIZE }
       );
@@ -61,21 +61,23 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Whether the value has risen three times in a row
-   * e.g. [500, 400, 300]
+   * e.g.
+   * True: 500 > 400 && 400 > 300
    */
   private isUpTrend() {
     return (
-      this.latestPrice > this.prevPrice && this.prevPrice > this.oldestPrice
+      this.latestPrice > this.secondPrice && this.secondPrice > this.thirdPrice
     );
   }
 
   /**
    * Whether the value has dropped three times in a row
-   * e.g. [300, 400, 500]
+   * e.g.
+   * True: 300 > 400 && 400 > 500
    */
   private isDownTrend() {
     return (
-      this.latestPrice < this.prevPrice && this.prevPrice < this.oldestPrice
+      this.latestPrice < this.secondPrice && this.secondPrice < this.thirdPrice
     );
   }
 }
