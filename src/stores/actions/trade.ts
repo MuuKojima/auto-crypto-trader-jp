@@ -35,6 +35,8 @@ export const trade = {
       return;
     }
     const priceRecords = context.getters<number[]>('trade.priceRecords').concat();
+    // Logging
+    logging.printMarketPriceStatus(latestPrice, priceRecords[0]);
     // If the maximum value is exceeded, remove the tail after adding the head.
     if (priceRecords.length > MAX_RECORD_SIZE) {
       priceRecords.unshift(latestPrice);
@@ -45,10 +47,6 @@ export const trade = {
     // Add to head
     priceRecords.unshift(latestPrice);
     context.commit('trade.priceRecords', { priceRecords });
-    // Logging
-    const _latestPrice = context.getters<number>('trade.latestPrice');
-    const priceStatus = context.getters<keyof typeof COMPARED_PRICE_STATUS>('trade.statusForLatestPriceComparedToPreviousPrice');
-    logging.printMarketPriceStatus(_latestPrice, priceStatus);
   },
 
   /**

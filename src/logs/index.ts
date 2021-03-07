@@ -21,16 +21,14 @@ const GRAPH_ICON = '📊';
  * Print the status of the current price compared to the previous price
  * @param context
  */
-const printMarketPriceStatus = (latestPrice: number, priceStatus: keyof typeof COMPARED_PRICE_STATUS): void => {
+const printMarketPriceStatus = (latestPrice: number, prevPrice: number): void => {
   let statusIcon: valueof<typeof COMPARED_PRICE_STATUS_ICON> = COMPARED_PRICE_STATUS_ICON.same;
-  switch(priceStatus) {
-    case COMPARED_PRICE_STATUS.up:
-      statusIcon = COMPARED_PRICE_STATUS_ICON.up;
-      break;
-    case COMPARED_PRICE_STATUS.down:
-      statusIcon = COMPARED_PRICE_STATUS_ICON.down;
-      break;
+  if (latestPrice > prevPrice) {
+    statusIcon = COMPARED_PRICE_STATUS_ICON.up
   }
+  if (latestPrice < prevPrice) {
+    statusIcon = COMPARED_PRICE_STATUS_ICON.down
+  };
   console.log(`${LOG_PREFIX} ${statusIcon}  ${latestPrice} ${PRICE_UNIT}`);
 }
 
