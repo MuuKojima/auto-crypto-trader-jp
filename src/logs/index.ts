@@ -14,10 +14,18 @@ const BENEFIT_ICON = {
   sweat: '😰',
 } as const;
 const GRAPH_ICON = '📊';
+const SUCCESS_ICON = '✅';
 
 /**
  * Print the status of the current price compared to the previous price
  * @param context
+ */
+const printOrderSuccess = (resultStr: string): void => {
+  console.log(`${LOG_PREFIX} ${SUCCESS_ICON} order success ${resultStr}`);
+};
+
+/**
+ * Print the status of the current price compared to the previous price
  */
 const printMarketPriceStatus = (
   latestPrice: number,
@@ -74,6 +82,7 @@ const printTotalBenefit = (totalBenefit: number): void => {
 };
 
 export const logging = {
+  printOrderSuccess,
   printMarketPriceStatus,
   printMyPricePosition,
   printSellPrice,

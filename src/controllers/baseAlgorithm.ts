@@ -8,6 +8,7 @@ import context from '../context';
 export class BaseTradeAlgorithm {
   private config = context.config;
   protected intervalSec = this.config.intervalSec;
+  protected orderSizeBTC = this.config.orderSizeBTC;
 
   /**
    * Dressup each lifecycle

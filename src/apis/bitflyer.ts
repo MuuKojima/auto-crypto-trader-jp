@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import * as crypto from 'crypto';
+import { logging } from '../logs';
 import {
   BitflyerBuyAndSellResponse,
   BitflyerErrorResponse,
@@ -161,6 +162,6 @@ export class BitflyerApi implements TradeApi {
         }
         throw err;
       });
-    console.log('[TRADING] order success', res);
+    logging.printOrderSuccess(String(res));
   }
 }
