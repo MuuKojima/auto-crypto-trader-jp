@@ -130,7 +130,6 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
 
   /**
    * Check postion status
-   * Output
    */
   private checkPositionStatus(): string {
     const gain = this.benefit;
