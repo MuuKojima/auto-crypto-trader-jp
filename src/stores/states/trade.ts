@@ -3,5 +3,6 @@ export const trade = {
   // [Latest ... Oldest]
   priceRecords: [],
   myPricePosition: 0,
+  benefit: 0,
   totalBenefit: 0
 };

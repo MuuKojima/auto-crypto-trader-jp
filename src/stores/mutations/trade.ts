@@ -28,6 +28,14 @@ export const trade = {
     return PUBLISHED_NAME;
   },
 
+  benefit: (
+    context: MutationContext<TradeContext>,
+    payload: { benefit: number }
+  ): string => {
+    context.states.trade.benefit = payload.benefit;
+    return PUBLISHED_NAME;
+  },
+
   totalBenefit: (
     context: MutationContext<TradeContext>,
     payload: { totalBenefit: number }

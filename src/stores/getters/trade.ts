@@ -4,6 +4,43 @@ import { TradeContext } from '../../types/stores';
 
 export const trade = {
   /**
+   * Ready to trade
+   */
+  isReady: (context: GetterContext<TradeContext>): boolean => {
+    return context.states.trade.isReady;
+  },
+
+  /**
+   * My price position
+   * @param context
+   */
+  myPricePosition: (
+    context: GetterContext<TradeContext>
+  ): number => {
+    return context.states.trade.myPricePosition;
+  },
+
+  /**
+   * Benefit
+   * @param context
+   */
+  benefit: (
+    context: GetterContext<TradeContext>
+  ): number => {
+    return context.states.trade.benefit;
+  },
+
+  /**
+   * Total benefit
+   * @param context
+   */
+  totalBenefit: (
+    context: GetterContext<TradeContext>
+  ): number => {
+    return context.states.trade.totalBenefit;
+  },
+
+  /**
    * All price record
    * e.g.
    * Resource: [500, 400, 300, 200, 100]
@@ -144,32 +181,5 @@ export const trade = {
     } else {
       return COMPARED_PRICE_STATUS.same
     };
-  },
-
-  /**
-   * Ready to trade
-   */
-  isReady: (context: GetterContext<TradeContext>): boolean => {
-    return context.states.trade.isReady;
-  },
-
-  /**
-   * My price position
-   * @param context
-   */
-  myPricePosition: (
-    context: GetterContext<TradeContext>
-  ): number => {
-    return context.states.trade.myPricePosition;
-  },
-
-  /**
-   * Total benefit
-   * @param context
-   */
-  totalBenefit: (
-    context: GetterContext<TradeContext>
-  ): number => {
-    return context.states.trade.totalBenefit;
-  },
+  }
 };

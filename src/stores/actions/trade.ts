@@ -104,6 +104,7 @@ export const trade = {
     const benefit = orderPrice - myPricePosition;
     const prevTotalBenefit = context.getters<number>('trade.totalBenefit');
     const totalBenefit = prevTotalBenefit + benefit;
+    context.commit('trade.benefit', { benefit });
     context.commit('trade.totalBenefit', { totalBenefit });
     // Clear postion
     context.commit('trade.myPricePosition', { clearMyPricePosition });

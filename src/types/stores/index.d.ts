@@ -9,6 +9,7 @@ export interface TradeContext {
     isReady: boolean,
     priceRecords: number[];
     myPricePosition: number,
+    benefit: number
     totalBenefit: number
   };
 }
