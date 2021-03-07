@@ -71,7 +71,7 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   /**
    * Whether the value has dropped three times in a row
    * e.g.
-   * True: 300 > 400 && 400 > 500
+   * True: 300 < 400 && 400 < 500
    */
   private isDownTrend() {
     return (
