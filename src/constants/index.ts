@@ -15,3 +15,9 @@ export const CONFIG_DEFAULT_SETTING = {
   orderSizeBTC: 0.01,
   intervalSec: 120,
 } as const;
+
+export const COMPARED_PRICE_STATUS = {
+  up: 'up',
+  down: 'down',
+  same: 'same',
+} as const;

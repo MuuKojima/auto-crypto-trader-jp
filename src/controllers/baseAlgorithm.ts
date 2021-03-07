@@ -7,11 +7,12 @@ import context from '../context';
  */
 export class BaseTradeAlgorithm {
   private config = context.config;
-  protected orderSizeBTC = this.config.orderSizeBTC;
   protected intervalSec = this.config.intervalSec;
+  protected orderSizeBTC = this.config.orderSizeBTC;
 
   /**
-   * Dressup lifecycle
+   * Dressup each lifecycle
+   * ready(), think(), dance()
    */
   async dressup(): Promise<void> {
     this.ready();
@@ -27,7 +28,7 @@ export class BaseTradeAlgorithm {
   }
 
   /**
-   * Think sell or buy
+   * Think sell or buy or standby
    */
   protected async think(): Promise<void> {
     // Override here

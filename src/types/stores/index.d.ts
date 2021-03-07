@@ -6,6 +6,10 @@ export interface Config {
 
 export interface TradeContext {
   trade: {
+    isReady: boolean,
     priceRecords: number[];
+    myPricePosition: number,
+    benefit: number
+    totalBenefit: number
   };
 }

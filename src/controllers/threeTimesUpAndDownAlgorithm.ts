@@ -1,117 +1,81 @@
 import store from '../stores';
 import { BaseTradeAlgorithm } from './baseAlgorithm';
 
-const MAX_SIZE = 3;
+const MAX_RECORDE_SIZE = 3;
 
 /**
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
  */
 export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
+  private isReady = false;
   private latestPrice = 0;
-  private prevPrice = 0;
-  private oldestPrice = 0;
-  private isIncreasedLatestPriceComparedToPreviousOne = false;
+  private secondPrice = 0;
+  private thirdPrice = 0;
   private myPricePosition = 0;
-  private totalBenefit = 0;
+
+  /**
+   * Dressup each lifecycle
+   * ready(), think(), dance()
+   */
+  async dressup(): Promise<void> {
+    await super.dressup();
+  }
 
   /**
    * Ready for subscribing
    */
   ready(): void {
+    this.isReady = store.getters<boolean>('trade.isReady');
+    this.myPricePosition = store.getters<number>('trade.myPricePosition');
     this.latestPrice = store.getters<number>('trade.latestPrice');
-    this.prevPrice = store.getters<number>('trade.prevPrice');
-    this.oldestPrice = store.getters<number, { size: number }>(
+    this.secondPrice = store.getters<number>('trade.prevPrice');
+    this.thirdPrice = store.getters<number, { size: number }>(
       'trade.oldestPriceByMaxSize',
-      { size: MAX_SIZE }
-    );
-    this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-      'trade.isIncreasedLatestPriceComparedToPreviousOne'
+      { size: MAX_RECORDE_SIZE }
     );
     store.subscribe('trade', async () => {
+      this.isReady = store.getters<boolean>('trade.isReady');
+      this.myPricePosition = store.getters<number>('trade.myPricePosition');
       this.latestPrice = store.getters<number>('trade.latestPrice');
-      this.prevPrice = store.getters<number>('trade.prevPrice');
-      this.oldestPrice = store.getters<number, { size: number }>(
+      this.secondPrice = store.getters<number>('trade.prevPrice');
+      this.thirdPrice = store.getters<number, { size: number }>(
         'trade.oldestPriceByMaxSize',
-        { size: MAX_SIZE }
+        { size: MAX_RECORDE_SIZE }
       );
-      this.isIncreasedLatestPriceComparedToPreviousOne = store.getters<boolean>(
-        'trade.isIncreasedLatestPriceComparedToPreviousOne'
-      );
-      await this.think();
+      this.isReady && (await this.think());
     });
   }
 
   /**
-   * Think sell or buy
+   * Think sell or buy or standby or standby
    */
   async think(): Promise<void> {
-    console.log(
-      `[TRADING] ${this.latestPrice} yen ${
-        this.isIncreasedLatestPriceComparedToPreviousOne ? '🔼' : '🔻'
-      } (orderSize: ${this.orderSizeBTC * this.latestPrice} yen)`
-    );
     if (this.myPricePosition) {
-      this.isUpTrend() && (await this.createSellOrder(this.orderSizeBTC));
+      this.isUpTrend() && (await store.dispatch('trade.marketSell'));
     } else {
-      this.isDownTrend() && (await this.createBuyOrder(this.orderSizeBTC));
+      this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
     }
   }
 
   /**
    * Whether the value has risen three times in a row
+   * e.g.
+   * True: 500 > 400 && 400 > 300
    */
   private isUpTrend() {
     return (
-      this.latestPrice > this.prevPrice && this.prevPrice > this.oldestPrice
+      this.latestPrice > this.secondPrice && this.secondPrice > this.thirdPrice
     );
   }
 
   /**
    * Whether the value has dropped three times in a row
+   * e.g.
+   * True: 300 > 400 && 400 > 500
    */
   private isDownTrend() {
     return (
-      this.latestPrice < this.prevPrice && this.prevPrice < this.oldestPrice
+      this.latestPrice < this.secondPrice && this.secondPrice < this.thirdPrice
     );
-  }
-
-  /**
-   * Sell
-   * 1. Sell order
-   * 2. Update total benefit
-   * 3. Show console for repors
-   * 4. Clear my position
-   * @param size {number}
-   */
-  private async createSellOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.sell', { size });
-    // Order report
-    const benefit = orderPrice - this.myPricePosition;
-    this.totalBenefit += benefit;
-    console.log(`[TRADING] 💰 ${orderPrice} yen`);
-    // Diff report
-    const upOrDown = benefit > 0 ? '😆' : '😰';
-    console.log(
-      `[TRADING] ---- ${upOrDown} diff: ${benefit} yen ${upOrDown} ----`
-    );
-    console.log(`[TRADING] ---- 📊 total: ${this.totalBenefit} yen 📊 ----`);
-    // Clear my position
-    this.myPricePosition = 0;
-  }
-
-  /**
-   * Buy
-   * 1. Buy order
-   * 2. Update my postion
-   * 3. Show console for order price
-   * @param size {number}
-   */
-  private async createBuyOrder(size: number): Promise<void> {
-    const orderPrice = this.latestPrice * size;
-    await store.dispatch('trade.buy', { size });
-    this.myPricePosition = orderPrice;
-    console.log(`[TRADING] 🛍 ${orderPrice} yen`);
-    console.log(this.myPricePosition);
   }
 }
