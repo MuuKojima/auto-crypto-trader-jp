@@ -14,7 +14,8 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   private myPricePosition = 0;
 
   /**
-   * Dressup lifecycle
+   * Dressup each lifecycle
+   * ready(), think(), dance()
    */
   async dressup(): Promise<void> {
     await super.dressup();
@@ -51,10 +52,10 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
   async think(): Promise<void> {
     if (this.myPricePosition) {
       this.isUpTrend() &&
-        (await store.dispatch('trade.marketSell', { size: this.orderSizeBTC }));
+        (await store.dispatch('trade.marketSell'));
     } else {
       this.isDownTrend() &&
-        (await store.dispatch('trade.marketBuy', { size: this.orderSizeBTC }));
+        (await store.dispatch('trade.marketBuy'));
     }
   }
 

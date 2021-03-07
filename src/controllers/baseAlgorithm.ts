@@ -7,11 +7,11 @@ import context from '../context';
  */
 export class BaseTradeAlgorithm {
   private config = context.config;
-  protected orderSizeBTC = this.config.orderSizeBTC;
   protected intervalSec = this.config.intervalSec;
 
   /**
-   * Dressup lifecycle
+   * Dressup each lifecycle
+   * ready(), think(), dance()
    */
   async dressup(): Promise<void> {
     this.ready();

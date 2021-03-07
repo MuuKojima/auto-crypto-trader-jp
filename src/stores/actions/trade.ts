@@ -5,6 +5,9 @@ import { logging } from '../../logs';
 
 const MAX_RECORD_SIZE = 1000;
 
+const sandboxMode = appContext.config.sandboxMode;
+const defaultOrderSizeBTC = appContext.config.orderSizeBTC;
+
 // Initialize tarde api
 // e.g. SERVICE_ID = 'bitflyer'
 // Output: new BitflyerApi(...)
@@ -58,14 +61,14 @@ export const trade = {
    */
   marketBuy: async (
     context: ActionContext,
-    payload: { size: number }
+    payload: { size: number } = { size: defaultOrderSizeBTC }
   ): Promise<void> => {
     const {
       size
     } = payload;
     // Prevent double order
     context.commit('trade.isReady', { isReady: false });
-    if (!appContext.config.sandboxMode) {
+    if (!sandboxMode) {
       await tradeApi.marketBuy(size);
     }
     const latestPrice = context.getters<number>('trade.latestPrice');
@@ -84,14 +87,14 @@ export const trade = {
   */
   marketSell: async (
     context: ActionContext,
-    payload: { size: number }
+    payload: { size: number } = { size: defaultOrderSizeBTC }
   ): Promise<void> => {
     const {
       size
     } = payload;
     // Prevent double order
     context.commit('trade.isReady', { isReady: false });
-    if (!appContext.config.sandboxMode) {
+    if (!sandboxMode) {
       await tradeApi.marketSell(size);
     }
     const myPricePosition = context.getters<number>('trade.myPricePosition');
