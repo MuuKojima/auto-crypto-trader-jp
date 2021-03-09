@@ -1,10 +1,11 @@
 import store from '../stores';
 import { BaseTradeAlgorithm } from './baseAlgorithm';
 import { elapsedSecFromNow } from '../utils';
+import { RSI } from 'technicalindicators';
 
-const COMPARE_INTERVAL_SEC = 30;
-const LOSS_CUT_DIFF_YEN = 50;
-const TAKE_GAIN_DIFF_YEN = 30;
+const COMPARE_INTERVAL_SEC = 10;
+const LOSS_CUT_DIFF_YEN = 20;
+const TAKE_GAIN_DIFF_YEN = 50;
 
 /**
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
@@ -16,6 +17,26 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
     enoughGain: 'enoughGain',
   } as const;
 
+  private RSI_STATUS = {
+    notEnoughData: 'notEnoughData',
+    isOnUpTrend: 'isOnUpTrend',
+    isOnDownTrend: 'isOnDownTrend',
+    othrer: 'othrer',
+  } as const;
+
+  private shortRSI = new RSI({
+    values: [],
+    period: (5 * 60) / this.intervalSec,
+  }); // 5 min
+  private mediumRSI = new RSI({
+    values: [],
+    period: (30 * 60) / this.intervalSec,
+  }); // 30 min
+  private longRSI = new RSI({
+    values: [],
+    period: (60 * 60) / this.intervalSec,
+  }); // 60 min
+
   private isReady = false;
   private myPricePosition = 0;
   private benefit = 0;
@@ -23,6 +44,10 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   private secondPrice = 0;
   private thirdPrice = 0;
   private lastComparedTime = Date.now();
+
+  private currentShortRSI: number | undefined;
+  private currentMediumRSI: number | undefined;
+  private currentLongRSI: number | undefined;
 
   /**
    * Dressup each lifecycle
@@ -48,12 +73,17 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       const watchLength = Math.round(COMPARE_INTERVAL_SEC / this.intervalSec);
       this.secondPrice = store.getters<number, { nth: number }>(
         'trade.nthPrice',
-        { nth: watchLength }
+        { nth: watchLength - 1 }
       );
       this.thirdPrice = store.getters<number, { nth: number }>(
         'trade.nthPrice',
-        { nth: watchLength * 2 }
+        { nth: (watchLength - 1) * 2 }
       );
+
+      this.currentShortRSI = this.shortRSI.nextValue(this.latestPrice);
+      this.currentMediumRSI = this.mediumRSI.nextValue(this.latestPrice);
+      this.currentLongRSI = this.longRSI.nextValue(this.latestPrice);
+
       this.isReady && (await this.think());
     });
   }
@@ -62,6 +92,25 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * Think sell or buy or standby
    */
   async think(): Promise<void> {
+    this.printRSIs();
+
+    const rsiStatus = this.checkRSIStatus();
+    switch (rsiStatus) {
+      case this.RSI_STATUS.notEnoughData:
+        return;
+
+      case this.RSI_STATUS.othrer:
+        return;
+
+      case this.RSI_STATUS.isOnDownTrend:
+        // TODO: Do Inverse Logic
+        return;
+
+      case this.RSI_STATUS.isOnUpTrend:
+        // can go
+        break;
+    }
+
     // check
     if (this.myPricePosition) {
       const status = this.checkPositionStatus();
@@ -77,12 +126,6 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
         default:
           break;
       }
-    }
-
-    if (this.myPricePosition) {
-      this.isUpTrend() && (await store.dispatch('trade.marketSell'));
-    } else {
-      this.isDownTrend() && (await store.dispatch('trade.marketBuy'));
     }
 
     // compare
@@ -144,5 +187,28 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       return this.POSITION_STATUS.enoughGain;
     }
     return '';
+  }
+
+  private checkRSIStatus(): string {
+    if (!this.currentShortRSI || !this.currentMediumRSI) {
+      return this.RSI_STATUS.notEnoughData;
+    }
+    const short = this.currentShortRSI;
+    const mid = this.currentMediumRSI;
+    if (short < 45 || mid < 45) {
+      return this.RSI_STATUS.isOnDownTrend;
+    }
+    if (short > 70 && mid > 60) {
+      return this.RSI_STATUS.isOnUpTrend;
+    }
+    return this.RSI_STATUS.othrer;
+  }
+
+  private printRSIs(): void {
+    console.log(
+      `short: ${this.currentShortRSI ?? '---'} | medium: ${
+        this.currentMediumRSI ?? '---'
+      } | long: ${this.currentLongRSI ?? '---'}`
+    );
   }
 }

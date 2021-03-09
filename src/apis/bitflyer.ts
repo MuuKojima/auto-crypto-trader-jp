@@ -43,8 +43,11 @@ export class BitflyerApi implements TradeApi {
    */
   async fetchPrices(): Promise<number | undefined> {
     const url = `${END_POINT}/ticker`;
+    const params = {
+      product_code: MARKET_SYMBOL,
+    };
     const res = await axios
-      .get<BitflyerFetchResponse>(url)
+      .get<BitflyerFetchResponse>(url, { params })
       .catch((err: AxiosError<BitflyerErrorResponse>) => {
         if (err.response !== undefined) {
           const errorMessage = `${err.response.data.status} : ${err.response.data.error_message}`;
