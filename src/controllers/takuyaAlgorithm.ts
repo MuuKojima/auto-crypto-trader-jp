@@ -205,6 +205,10 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   }
 
   private printRSIs(): void {
-    // console.log(`short: ${this.currentShortRSI} | medium: ${this.currentMediumRSI} | long: ${this.currentLongRSI}`);
+    console.log(
+      `short: ${this.currentShortRSI ?? '---'} | medium: ${
+        this.currentMediumRSI ?? '---'
+      } | long: ${this.currentLongRSI ?? '---'}`
+    );
   }
 }
