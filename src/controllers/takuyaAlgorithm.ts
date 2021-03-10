@@ -94,21 +94,20 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   async think(): Promise<void> {
     this.printRSIs();
 
-    const rsiStatus = this.checkRSIStatus();
-    switch (rsiStatus) {
-      case this.RSI_STATUS.notEnoughData:
-        return;
-
-      case this.RSI_STATUS.othrer:
-        return;
-
-      case this.RSI_STATUS.isOnDownTrend:
-        // TODO: Do Inverse Logic
-        return;
-
-      case this.RSI_STATUS.isOnUpTrend:
-        // can go
-        break;
+    if (!this.myPricePosition) {
+      const rsiStatus = this.checkRSIStatus();
+      switch (rsiStatus) {
+        case this.RSI_STATUS.notEnoughData:
+          return;
+        case this.RSI_STATUS.othrer:
+          return;
+        case this.RSI_STATUS.isOnDownTrend:
+          // TODO: Do Inversed Logic
+          return;
+        case this.RSI_STATUS.isOnUpTrend:
+          // can go
+          break;
+      }
     }
 
     // check
@@ -175,7 +174,7 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
    * Check postion status
    */
   private checkPositionStatus(): string {
-    const gain = this.benefit;
+    const gain = this.latestPrice * this.orderSizeBTC - this.myPricePosition;
     const loss = -gain;
     console.log(`[CheckPositionStatus] gain: ${gain}`);
     if (loss > LOSS_CUT_DIFF_YEN) {
@@ -190,15 +189,23 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   }
 
   private checkRSIStatus(): string {
-    if (!this.currentShortRSI || !this.currentMediumRSI) {
+    if (
+      !this.currentShortRSI ||
+      !this.currentMediumRSI ||
+      !this.currentLongRSI
+    ) {
       return this.RSI_STATUS.notEnoughData;
     }
     const short = this.currentShortRSI;
     const mid = this.currentMediumRSI;
-    if (short < 45 || mid < 45) {
+    const long = this.currentLongRSI;
+    if (short < 40 || mid < 45 || long < 30) {
       return this.RSI_STATUS.isOnDownTrend;
     }
-    if (short > 70 && mid > 60) {
+    if (short > 55 && mid > 55) {
+      return this.RSI_STATUS.isOnUpTrend;
+    }
+    if (mid > 50 && long > 50) {
       return this.RSI_STATUS.isOnUpTrend;
     }
     return this.RSI_STATUS.othrer;
