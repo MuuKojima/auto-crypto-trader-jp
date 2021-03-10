@@ -7,23 +7,24 @@ const COMPARE_INTERVAL_SEC = 10;
 const LOSS_CUT_DIFF_YEN = 20;
 const TAKE_GAIN_DIFF_YEN = 50;
 
+const POSITION_STATUS = {
+  tooLoss: 'tooLoss',
+  enoughGain: 'enoughGain',
+  other: 'other',
+} as const;
+
+const RSI_STATUS = {
+  notEnoughData: 'notEnoughData',
+  isOnUpTrend: 'isOnUpTrend',
+  isOnDownTrend: 'isOnDownTrend',
+  other: 'other',
+} as const;
+
 /**
  * Logic to sell if it rises 3 times in a row, and buy if it falls 3 times in a row
  * + Loss-cut function
  */
 export class TakuyaAlgorithm extends BaseTradeAlgorithm {
-  private POSITION_STATUS = {
-    tooLoss: 'tooLoss',
-    enoughGain: 'enoughGain',
-  } as const;
-
-  private RSI_STATUS = {
-    notEnoughData: 'notEnoughData',
-    isOnUpTrend: 'isOnUpTrend',
-    isOnDownTrend: 'isOnDownTrend',
-    othrer: 'othrer',
-  } as const;
-
   private shortRSI = new RSI({
     values: [],
     period: (5 * 60) / this.intervalSec,
@@ -97,14 +98,14 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
     if (!this.myPricePosition) {
       const rsiStatus = this.checkRSIStatus();
       switch (rsiStatus) {
-        case this.RSI_STATUS.notEnoughData:
+        case RSI_STATUS.notEnoughData:
           return;
-        case this.RSI_STATUS.othrer:
+        case RSI_STATUS.other:
           return;
-        case this.RSI_STATUS.isOnDownTrend:
+        case RSI_STATUS.isOnDownTrend:
           // TODO: Do Inversed Logic
           return;
-        case this.RSI_STATUS.isOnUpTrend:
+        case RSI_STATUS.isOnUpTrend:
           // can go
           break;
       }
@@ -114,11 +115,11 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
     if (this.myPricePosition) {
       const status = this.checkPositionStatus();
       switch (status) {
-        case this.POSITION_STATUS.tooLoss:
+        case POSITION_STATUS.tooLoss:
           // loss cut
           await store.dispatch('trade.marketSell');
           break;
-        case this.POSITION_STATUS.enoughGain:
+        case POSITION_STATUS.enoughGain:
           // take gain
           await store.dispatch('trade.marketSell');
           break;
@@ -173,42 +174,42 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
   /**
    * Check postion status
    */
-  private checkPositionStatus(): string {
+  private checkPositionStatus(): keyof typeof POSITION_STATUS {
     const gain = this.latestPrice * this.orderSizeBTC - this.myPricePosition;
     const loss = -gain;
     console.log(`[CheckPositionStatus] gain: ${gain}`);
     if (loss > LOSS_CUT_DIFF_YEN) {
       console.log('🛡 toLoss!!');
-      return this.POSITION_STATUS.tooLoss;
+      return POSITION_STATUS.tooLoss;
     }
     if (gain > TAKE_GAIN_DIFF_YEN) {
       console.log('👌 enough gain!');
-      return this.POSITION_STATUS.enoughGain;
+      return POSITION_STATUS.enoughGain;
     }
-    return '';
+    return POSITION_STATUS.other;
   }
 
-  private checkRSIStatus(): string {
+  private checkRSIStatus(): keyof typeof RSI_STATUS {
     if (
       !this.currentShortRSI ||
       !this.currentMediumRSI ||
       !this.currentLongRSI
     ) {
-      return this.RSI_STATUS.notEnoughData;
+      return RSI_STATUS.notEnoughData;
     }
     const short = this.currentShortRSI;
     const mid = this.currentMediumRSI;
     const long = this.currentLongRSI;
     if (short < 40 || mid < 45 || long < 30) {
-      return this.RSI_STATUS.isOnDownTrend;
+      return RSI_STATUS.isOnDownTrend;
     }
     if (short > 55 && mid > 55) {
-      return this.RSI_STATUS.isOnUpTrend;
+      return RSI_STATUS.isOnUpTrend;
     }
     if (mid > 50 && long > 50) {
-      return this.RSI_STATUS.isOnUpTrend;
+      return RSI_STATUS.isOnUpTrend;
     }
-    return this.RSI_STATUS.othrer;
+    return RSI_STATUS.other;
   }
 
   private printRSIs(): void {
