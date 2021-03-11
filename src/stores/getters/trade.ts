@@ -52,25 +52,6 @@ export const trade = {
   },
 
   /**
-   * Price records by max size
-   * e.g. size = 3
-   * Resource: [500, 400, 300, 200, 100]
-   * Output: [500, 400, 300]
-   * @param context
-   * @param payload
-   */
-  priceRecordsByMaxSize: (
-    context: GetterContext<TradeContext>,
-    payload: { size: number }
-  ): number[] => {
-    const priceRecords = context.states.trade.priceRecords;
-    if (priceRecords.length <= payload.size) {
-      return priceRecords;
-    }
-    return priceRecords.slice(0, payload.size);
-  },
-
-  /**
    * Latest price
    * e.g.
    * Resource: [500, 400, 300, 200, 100]
@@ -82,48 +63,18 @@ export const trade = {
   },
 
   /**
-   * Prev price
-   * e.g.
-   * Resource: [500, 400, 300, 200, 100]
-   * Output: 400
-   * @param context
-   */
-  prevPrice: (context: GetterContext<TradeContext>): number => {
-    return context.states.trade.priceRecords[1];
-  },
-
-  /**
-   * Oldest price
-   * e.g.
-   * Resource: [500, 400, 300, 200, 100]
-   * Output: 100
-   * @param context
-   */
-  oldestPrice: (context: GetterContext<TradeContext>): number => {
-    const priceRecords = context.states.trade.priceRecords;
-    const oldestPrice = priceRecords[priceRecords.length - 1];
-    return oldestPrice;
-  },
-
-  /**
-   * Oldest price by max size
-   * e.g. size = 3
+   * nth price
+   * e.g. nth = 2
    * Resource: [500, 400, 300, 200, 100]
    * Output: 300
    * @param context
    * @param payload
    */
-  oldestPriceByMaxSize: (
+  nthPrice: (
     context: GetterContext<TradeContext>,
-    payload: { size: number }
+    payload: { nth: number }
   ): number => {
-    const priceRecords = context.states.trade.priceRecords;
-    if (priceRecords.length <= payload.size) {
-      return priceRecords[priceRecords.length - 1];
-    }
-    const _priceRecords = priceRecords.slice(0, payload.size);
-    const oldestPrice = _priceRecords[_priceRecords.length - 1];
-    return oldestPrice;
+    return context.states.trade.priceRecords[payload.nth];
   },
 
   /**
@@ -134,7 +85,7 @@ export const trade = {
    * @param context
    * @param payload
    */
-  nthPrice: (
+  nthPriceByWatch: (
     context: GetterContext<TradeContext>,
     payload: { nth: number }
   ): number => {

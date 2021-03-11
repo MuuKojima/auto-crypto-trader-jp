@@ -5,15 +5,6 @@ import { logging } from '../../logs';
 
 const MAX_RECORD_SIZE = 1000;
 
-// Initialize tarde api
-// e.g. SERVICE_ID = 'bitflyer'
-// Output: new BitflyerApi(...)
-const tradeApi = TradeAPI.init(
-  process.env.SERVICE_ID,
-  process.env.API_KEY || '',
-  process.env.API_SECRET || ''
-);
-
 export const trade = {
   /**
    * Ready to trade
@@ -32,7 +23,7 @@ export const trade = {
    * @param context
    */
   fetch: async (context: ActionContext): Promise<void> => {
-    const latestPrice = await tradeApi.fetchPrices();
+    const latestPrice = await appContext.tradeApi.fetchPrices();
     if (!latestPrice) {
       return;
     }
@@ -66,7 +57,7 @@ export const trade = {
     // Prevent double order
     context.commit('trade.isReady', { isReady: false });
     if (!appContext.config.sandboxMode) {
-      await tradeApi.marketBuy(size);
+      await appContext.tradeApi.marketBuy(size);
     }
     const latestPrice = context.getters<number>('trade.latestPrice');
     const myPricePosition = Math.floor(latestPrice * size);
@@ -92,7 +83,7 @@ export const trade = {
     // Prevent double order
     context.commit('trade.isReady', { isReady: false });
     if (!appContext.config.sandboxMode) {
-      await tradeApi.marketSell(size);
+      await appContext.tradeApi.marketSell(size);
     }
     const myPricePosition = context.getters<number>('trade.myPricePosition');
     const latestPrice = context.getters<number>('trade.latestPrice');

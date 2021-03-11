@@ -73,11 +73,11 @@ export class TakuyaAlgorithm extends BaseTradeAlgorithm {
       this.latestPrice = store.getters<number>('trade.latestPrice');
       const watchLength = Math.round(COMPARE_INTERVAL_SEC / this.intervalSec);
       this.secondPrice = store.getters<number, { nth: number }>(
-        'trade.nthPrice',
+        'trade.nthPriceByWatch',
         { nth: watchLength - 1 }
       );
       this.thirdPrice = store.getters<number, { nth: number }>(
-        'trade.nthPrice',
+        'trade.nthPriceByWatch',
         { nth: (watchLength - 1) * 2 }
       );
 
