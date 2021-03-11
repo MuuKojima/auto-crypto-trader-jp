@@ -78,7 +78,7 @@ export const trade = {
   },
 
   /**
-   * nth price
+   * nth price by watch
    * e.g. nth = 0
    * Resource: [500, 400, 300, 200, 100]
    * Output: 500
