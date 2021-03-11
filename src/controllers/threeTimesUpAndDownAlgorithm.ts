@@ -33,10 +33,9 @@ export class ThreeTimesUpAndDownAlgorithm extends BaseTradeAlgorithm {
       'trade.nthPrice',
       { nth: 1 }
     );
-    this.thirdPrice = store.getters<number, { nth: number }>(
-      'trade.nthPrice',
-      { nth: 2 }
-    );
+    this.thirdPrice = store.getters<number, { nth: number }>('trade.nthPrice', {
+      nth: 2,
+    });
     store.subscribe('trade', async () => {
       this.isReady = store.getters<boolean>('trade.isReady');
       this.myPricePosition = store.getters<number>('trade.myPricePosition');

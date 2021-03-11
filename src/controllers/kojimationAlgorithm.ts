@@ -34,10 +34,9 @@ export class KojimationAlgorithm extends BaseTradeAlgorithm {
       'trade.nthPrice',
       { nth: 1 }
     );
-    this.thirdPrice = store.getters<number, { nth: number }>(
-      'trade.nthPrice',
-      { nth: 2 }
-    );
+    this.thirdPrice = store.getters<number, { nth: number }>('trade.nthPrice', {
+      nth: 2,
+    });
     this.fourthPrice = store.getters<number, { nth: number }>(
       'trade.nthPrice',
       { nth: 3 }
@@ -83,7 +82,9 @@ export class KojimationAlgorithm extends BaseTradeAlgorithm {
    */
   private isUpTrend() {
     return (
-      this.latestPrice > this.secondPrice && this.secondPrice > this.thirdPrice && this.thirdPrice > this.fourthPrice
+      this.latestPrice > this.secondPrice &&
+      this.secondPrice > this.thirdPrice &&
+      this.thirdPrice > this.fourthPrice
     );
   }
 

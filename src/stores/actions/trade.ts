@@ -1,4 +1,3 @@
-import TradeAPI from '../../apis';
 import appContext from '../../context';
 import { ActionContext } from '../../stores/storeManager';
 import { logging } from '../../logs';
