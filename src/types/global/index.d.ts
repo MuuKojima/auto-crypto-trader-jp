@@ -6,7 +6,7 @@ declare namespace NodeJS {
       | 'development'
       | 'staging'
       | 'production';
-    readonly ALGORITHM_ID: 'treetimes-up-and-down';
+    readonly ALGORITHM_ID: 'three-times-up-and-down';
     readonly SERVICE_ID: 'bitflyer';
   }
 }

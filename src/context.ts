@@ -4,6 +4,7 @@ dotenv.config();
 import fs from 'fs';
 import path from 'path';
 import { Config } from './types/stores';
+import TradeAPI from '../src/apis';
 
 const CONFIGS_DIR = 'configs';
 const CONFIG_EXTESION = '.json';
@@ -17,12 +18,25 @@ class Context {
     intervalSec: CONFIG_DEFAULT_SETTING.intervalSec,
   };
 
+  // Initialize tarde api
+  // e.g. SERVICE_ID = 'bitflyer'
+  // Output: new BitflyerApi(...)
+  private _tradeApi = TradeAPI.init(
+    process.env.SERVICE_ID,
+    process.env.API_KEY || '',
+    process.env.API_SECRET || ''
+  );
+
   init() {
     this.initConfig();
   }
 
   get config() {
     return this._config;
+  }
+
+  get tradeApi() {
+    return this._tradeApi;
   }
 
   private initConfig() {
