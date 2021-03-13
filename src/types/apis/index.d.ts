@@ -19,3 +19,7 @@ export interface BitflyerErrorResponse {
   status: number;
   error_message: string;
 }
+
+export interface LiquidFetchResponse {
+  last_traded_price: number;
+}

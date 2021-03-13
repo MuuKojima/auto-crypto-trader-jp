@@ -4,12 +4,12 @@ import { logging } from '../logs';
 import {
   BitflyerBuyAndSellResponse,
   BitflyerErrorResponse,
-  BitflyerFetchResponse,
+  LiquidFetchResponse,
   TradeApi,
 } from '../types/apis';
 
-const END_POINT = 'https://api.bitflyer.com/v1';
-const MARKET_SYMBOL = 'FX_BTC_JPY';
+const END_POINT = 'https://api.liquid.com/products';
+const PRODUCT_JPY_ID = '5';
 
 interface OrderRequestBody {
   product_code: string;
@@ -22,7 +22,7 @@ interface OrderRequestBody {
 
 /**
  * LiquidApi
- * @see: https://lightning.bitflyer.com/docs?lang=ja
+ * @see: https://developers.liquid.com/
  */
 export class LiquidApi implements TradeApi {
   private apiKey;
@@ -42,20 +42,13 @@ export class LiquidApi implements TradeApi {
    * Fetch prices
    */
   async fetchPrices(): Promise<number | undefined> {
-    const url = `${END_POINT}/ticker`;
-    const params = {
-      product_code: MARKET_SYMBOL,
-    };
+    const url = `${END_POINT}/${PRODUCT_JPY_ID}`;
     const res = await axios
-      .get<BitflyerFetchResponse>(url, { params })
-      .catch((err: AxiosError<BitflyerErrorResponse>) => {
-        if (err.response !== undefined) {
-          const errorMessage = `${err.response.data.status} : ${err.response.data.error_message}`;
-          console.error('TradeError: ', errorMessage);
-        }
+      .get<LiquidFetchResponse>(url)
+      .catch((err) => {
         throw err;
       });
-    return res.data.ltp;
+    return res.data.last_traded_price;
   }
 
   /**
@@ -70,7 +63,7 @@ export class LiquidApi implements TradeApi {
     minute_to_expire: number | undefined = undefined
   ): Promise<void> {
     await this.sendChildOrder({
-      product_code: MARKET_SYMBOL,
+      product_code: PRODUCT_JPY_ID,
       child_order_type: 'LIMIT',
       side: 'BUY',
       size: btcSize,
@@ -91,7 +84,7 @@ export class LiquidApi implements TradeApi {
     minute_to_expire: number | undefined = undefined
   ): Promise<void> {
     await this.sendChildOrder({
-      product_code: MARKET_SYMBOL,
+      product_code: PRODUCT_JPY_ID,
       child_order_type: 'LIMIT',
       side: 'SELL',
       size: btcSize,
@@ -110,7 +103,7 @@ export class LiquidApi implements TradeApi {
     minute_to_expire: number | undefined = undefined
   ): Promise<void> {
     await this.sendChildOrder({
-      product_code: MARKET_SYMBOL,
+      product_code: PRODUCT_JPY_ID,
       child_order_type: 'MARKET',
       side: 'BUY',
       size: btcSize,
@@ -128,7 +121,7 @@ export class LiquidApi implements TradeApi {
     minute_to_expire: number | undefined = undefined
   ): Promise<void> {
     await this.sendChildOrder({
-      product_code: MARKET_SYMBOL,
+      product_code: PRODUCT_JPY_ID,
       child_order_type: 'MARKET',
       side: 'SELL',
       size: btcSize,
