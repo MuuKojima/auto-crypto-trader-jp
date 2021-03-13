@@ -43,8 +43,13 @@ export class LiquidApi implements TradeApi {
    */
   async fetchPrices(): Promise<number | undefined> {
     const url = `${END_POINT}/${PRODUCT_JPY_ID}`;
+    const config = {
+      headers: {
+        'X-Quoine-API-Version': 2,
+      },
+    };
     const res = await axios
-      .get<LiquidFetchResponse>(url)
+      .get<LiquidFetchResponse>(url, config)
       .catch((err) => {
         throw err;
       });
