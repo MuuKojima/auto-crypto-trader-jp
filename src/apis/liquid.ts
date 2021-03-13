@@ -1,6 +1,4 @@
 import axios from 'axios';
-// import { sign, Algorithm } from 'jsonwebtoken';
-// import * as jwt from 'json-web-token';
 import * as ccxt from 'ccxt';
 import { logging } from '../logs';
 import {
@@ -14,7 +12,7 @@ const X_QUOINE_API_VERSION = {
   key: 'X-Quoine-API-Version',
   val: 2
 } as const;
-// const X_QUOINE_API_AUTH = 'X-Quoine-Auth';
+
 const TRADE_TYPE = {
   buy: 'buy',
   sell: 'sell'
@@ -27,6 +25,7 @@ const TRADE_TYPE = {
 export class LiquidApi implements TradeApi {
   private apiKey;
   private apiSecret;
+  private liquid;
 
   /**
    * Constructor
@@ -36,6 +35,10 @@ export class LiquidApi implements TradeApi {
   constructor(apiKey: string, apiSecret: string) {
     this.apiKey = apiKey;
     this.apiSecret = apiSecret;
+    this.liquid = new ccxt.liquid({
+      apiKey: this.apiKey,
+      secret: this.apiSecret
+    })
   }
 
   /**
@@ -98,51 +101,9 @@ export class LiquidApi implements TradeApi {
    * @param btcSize
    */
   private async sendChildOrder(side: keyof typeof TRADE_TYPE, btcSize: number): Promise<void> {
-    const liquid = new ccxt.liquid({
-      apiKey: this.apiKey,
-      secret: this.apiSecret
-    })
-    // const path = '/orders/';
-    // const authPayload = {
-    //   path,
-    //   nonce: Date.now().toString(),
-    //   token_id: this.apiKey
-    // };
-    // const signature: string | undefined = await new Promise((resolve, reject) => {
-    //   jwt.encode(this.apiSecret, authPayload, 'HS256', function (err, res) {
-    //     if (err) {
-    //       console.log('🔥 エラー');
-    //     } else {
-    //       resolve(res);
-    //     }
-    //   });
-    // });
-    // const body = JSON.stringify({
-    //   "order": {
-    //     "order_type": "market",
-    //     "product_id": 5,
-    //     side,
-    //     "quantity": btcSize,
-    //   }
-    // });
-    // const config = {
-    //   body,
-    //   headers: {
-    //     [X_QUOINE_API_VERSION.key]: X_QUOINE_API_VERSION.val,
-    //     [X_QUOINE_API_AUTH]: signature
-    //   },
-    //   'Content-Type' : 'application/json'
-    // };
-    // const url = `${END_POINT}${path}`;
-    // const res = await axios
-    //   .post(url, config)
-    //   .catch((err) => {
-    //     console.error('🚨 TradeError: ', new Error(err));
-    //     throw err;
-    //   });
-    const res = await liquid.createMarketOrder('BTC/JPY', side, btcSize)
+    const res = await this.liquid.createMarketOrder('BTC/JPY', side, btcSize)
       .catch((err) => {
-        console.error('🚨 TradeError: ', new Error(err));
+        console.error('🚨 TradeError: ', err);
         throw err;
       });
     // Logging
