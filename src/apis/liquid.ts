@@ -1,24 +1,24 @@
-import axios, { AxiosError } from 'axios';
-import * as crypto from 'crypto';
+import axios from 'axios';
+// import { sign, Algorithm } from 'jsonwebtoken';
+// import * as jwt from 'json-web-token';
+import * as ccxt from 'ccxt';
 import { logging } from '../logs';
 import {
-  BitflyerBuyAndSellResponse,
-  BitflyerErrorResponse,
   LiquidFetchResponse,
   TradeApi,
 } from '../types/apis';
 
-const END_POINT = 'https://api.liquid.com/products';
-const PRODUCT_JPY_ID = '5';
-
-interface OrderRequestBody {
-  product_code: string;
-  child_order_type: string;
-  side: string;
-  size: number;
-  price?: number;
-  minute_to_expire: number | undefined;
-}
+const END_POINT = 'https://api.liquid.com';
+const PRODUCT_JPY_ID = 5;
+const X_QUOINE_API_VERSION = {
+  key: 'X-Quoine-API-Version',
+  val: 2
+} as const;
+// const X_QUOINE_API_AUTH = 'X-Quoine-Auth';
+const TRADE_TYPE = {
+  buy: 'buy',
+  sell: 'sell'
+} as const;
 
 /**
  * LiquidApi
@@ -42,10 +42,10 @@ export class LiquidApi implements TradeApi {
    * Fetch prices
    */
   async fetchPrices(): Promise<number | undefined> {
-    const url = `${END_POINT}/${PRODUCT_JPY_ID}`;
+    const url = `${END_POINT}/products/${PRODUCT_JPY_ID}`;
     const config = {
       headers: {
-        'X-Quoine-API-Version': 2,
+        [X_QUOINE_API_VERSION.key]: X_QUOINE_API_VERSION.val,
       },
     };
     const res = await axios
@@ -58,113 +58,94 @@ export class LiquidApi implements TradeApi {
 
   /**
    * Buy at limit price
-   * @param btcSize
-   * @param price
-   * @param minute_to_expire
    */
   async buy(
-    btcSize: number,
-    price: number,
-    minute_to_expire: number | undefined = undefined
   ): Promise<void> {
-    await this.sendChildOrder({
-      product_code: PRODUCT_JPY_ID,
-      child_order_type: 'LIMIT',
-      side: 'BUY',
-      size: btcSize,
-      price,
-      minute_to_expire,
-    });
+    // do nothing
   }
 
   /**
    * Sell at limit price
-   * @param btcSize
-   * @param price
-   * @param minute_to_expire
    */
   async sell(
-    btcSize: number,
-    price: number,
-    minute_to_expire: number | undefined = undefined
   ): Promise<void> {
-    await this.sendChildOrder({
-      product_code: PRODUCT_JPY_ID,
-      child_order_type: 'LIMIT',
-      side: 'SELL',
-      size: btcSize,
-      price,
-      minute_to_expire,
-    });
+    // do nothing
   }
 
   /**
    * Market buy
    * @param btcSize
-   * @param body
    */
   async marketBuy(
-    btcSize: number,
-    minute_to_expire: number | undefined = undefined
+    btcSize: number
   ): Promise<void> {
-    await this.sendChildOrder({
-      product_code: PRODUCT_JPY_ID,
-      child_order_type: 'MARKET',
-      side: 'BUY',
-      size: btcSize,
-      minute_to_expire,
-    });
+    return await this.sendChildOrder('buy', btcSize);
   }
 
   /**
    * Market sell
    * @param btcSize
-   * @param body
    */
   async marketSell(
     btcSize: number,
-    minute_to_expire: number | undefined = undefined
   ): Promise<void> {
-    await this.sendChildOrder({
-      product_code: PRODUCT_JPY_ID,
-      child_order_type: 'MARKET',
-      side: 'SELL',
-      size: btcSize,
-      minute_to_expire,
-    });
+    return await this.sendChildOrder('sell', btcSize);
   }
 
   /**
    * Send child order
-   * @param body
+   * @param side
+   * @param btcSize
    */
-  private async sendChildOrder(body: OrderRequestBody): Promise<void> {
-    const timestamp = Date.now().toString();
-    const data = JSON.stringify(body);
-    const text = `${timestamp}POST/v1/me/sendchildorder${data}`;
-    const sign = crypto
-      .createHmac('sha256', this.apiSecret)
-      .update(text)
-      .digest('hex');
-    const url = `${END_POINT}/me/sendchildorder`;
-    const config = {
-      headers: {
-        'ACCESS-KEY': this.apiKey,
-        'ACCESS-TIMESTAMP': timestamp,
-        'ACCESS-SIGN': sign,
-        'Content-Type': 'application/json',
-      },
-    };
-    const res = await axios
-      .post<BitflyerBuyAndSellResponse>(url, data, config)
-      .catch((err: AxiosError<BitflyerErrorResponse>) => {
-        if (err.response !== undefined) {
-          const errorMessage = `${err.response.data.status} : ${err.response.data.error_message}`;
-          console.error('TradeError: ', errorMessage);
-        }
+  private async sendChildOrder(side: keyof typeof TRADE_TYPE, btcSize: number): Promise<void> {
+    const liquid = new ccxt.liquid({
+      apiKey: this.apiKey,
+      secret: this.apiSecret
+    })
+    // const path = '/orders/';
+    // const authPayload = {
+    //   path,
+    //   nonce: Date.now().toString(),
+    //   token_id: this.apiKey
+    // };
+    // const signature: string | undefined = await new Promise((resolve, reject) => {
+    //   jwt.encode(this.apiSecret, authPayload, 'HS256', function (err, res) {
+    //     if (err) {
+    //       console.log('🔥 エラー');
+    //     } else {
+    //       resolve(res);
+    //     }
+    //   });
+    // });
+    // const body = JSON.stringify({
+    //   "order": {
+    //     "order_type": "market",
+    //     "product_id": 5,
+    //     side,
+    //     "quantity": btcSize,
+    //   }
+    // });
+    // const config = {
+    //   body,
+    //   headers: {
+    //     [X_QUOINE_API_VERSION.key]: X_QUOINE_API_VERSION.val,
+    //     [X_QUOINE_API_AUTH]: signature
+    //   },
+    //   'Content-Type' : 'application/json'
+    // };
+    // const url = `${END_POINT}${path}`;
+    // const res = await axios
+    //   .post(url, config)
+    //   .catch((err) => {
+    //     console.error('🚨 TradeError: ', new Error(err));
+    //     throw err;
+    //   });
+    const res = await liquid.createMarketOrder('BTC/JPY', side, btcSize)
+      .catch((err) => {
+        console.error('🚨 TradeError: ', new Error(err));
         throw err;
       });
     // Logging
-    logging.printOrderSuccess(String(res));
+    logging.printOrderSuccess(String(res.price));
   }
 }
