@@ -1,5 +1,5 @@
 {
   "sandboxMode": false,
   "orderSizeBTC": 0.01,
-  "intervalSec": 10
+  "intervalSec": 3
 }
