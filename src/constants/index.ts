@@ -6,6 +6,7 @@ export const ALGORITHM_ID_MAP = {
 
 export const SERVICE_ID_MAP = {
   bitflyer: 'bitflyer',
+  liquid: 'liquid',
 } as const;
 
 export const CONFIG_DEFAULT_SETTING = {

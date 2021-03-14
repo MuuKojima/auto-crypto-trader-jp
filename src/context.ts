@@ -4,7 +4,7 @@ dotenv.config();
 import fs from 'fs';
 import path from 'path';
 import { Config } from './types/stores';
-import TradeAPI from '../src/apis';
+import TradeAPI from './apis';
 
 const CONFIGS_DIR = 'configs';
 const CONFIG_EXTESION = '.json';
